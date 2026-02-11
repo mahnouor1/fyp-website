@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Addy – Your Personal AI Companion for Emotional Well-Being</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #fafbff;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --muted: #5c5c6e;
+      --accent: #6d5b8a;
+      --accent-light: #e8e4f2;
+      --gradient-hero: linear-gradient(135deg, #e8e4f2 0%, #f0ecf8 50%, #e8eef8 100%);
+      --gradient-cta: linear-gradient(135deg, #6d5b8a 0%, #8b7aa8 100%);
+      --shadow: 0 4px 24px rgba(109, 91, 138, 0.08);
+      --radius: 12px;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ----- Hero ----- */
+    .hero {
+      position: relative;
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 60px 24px 80px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('hero-banner.png');
+      background-size: cover;
+      background-position: right center;
+      background-repeat: no-repeat;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 30%, rgba(26,26,46,0.12) 70%, rgba(26,26,46,0.25) 100%);
+      pointer-events: none;
+    }
+    .hero .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .hero-content {
+      max-width: 480px;
+    }
+    .hero-content h1 {
+      font-size: 2.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      color: #1a1a2e;
+    }
+    .hero-content .sub {
+      font-size: 1rem;
+      color: #1a1a2e;
+      margin-bottom: 16px;
+      opacity: 0.85;
+    }
+    .hero-content .tagline {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+    }
+    .hero-content .desc {
+      font-size: 1rem;
+      color: #1a1a2e;
+      margin-bottom: 28px;
+      line-height: 1.55;
+      opacity: 0.9;
+    }
+    .hero-btns {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 100%);
+      color: var(--accent);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.45);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .hero .btn-secondary {
+      background: rgba(255,255,255,0.75);
+      color: var(--text);
+      border-color: rgba(26,26,46,0.2);
+    }
+    .hero-github-wrap {
+      margin-top: 20px;
+    }
+    .btn-github {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1a1a2e;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(26,26,46,0.15);
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .btn-github:hover {
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .btn-github svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+    .hero-visual {
+      display: none;
+    }
+
+    /* ----- About ----- */
+    .about-sec {
+      padding: 80px 24px;
+    }
+    .about-sec .wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: start;
+    }
+    .about-sec h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .about-sec .about-text {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    .about-chart-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .about-chart-wrap img {
+      max-width: 100%;
+      width: 100%;
+      height: auto;
+      max-height: 420px;
+      object-fit: contain;
+      border-radius: var(--radius);
+    }
+    @media (min-width: 769px) {
+      .about-chart-wrap img {
+        max-width: 420px;
+      }
+    }
+
+    /* ----- Features ----- */
+    .features-sec {
+      padding: 80px 24px;
+      background: var(--card);
+    }
+    .features-sec h2 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 48px;
+      text-align: center;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .feature-card {
+      background: #8dc9ef;
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+    .features-sec.in-view .feature-card {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .features-sec.in-view .feature-card:nth-child(1) { transition-delay: 0.05s; }
+    .features-sec.in-view .feature-card:nth-child(2) { transition-delay: 0.15s; }
+    .features-sec.in-view .feature-card:nth-child(3) { transition-delay: 0.25s; }
+    .features-sec.in-view .feature-card:nth-child(4) { transition-delay: 0.35s; }
+    .features-sec.in-view .feature-card:nth-child(5) { transition-delay: 0.45s; }
+    .features-sec.in-view .feature-card:nth-child(6) { transition-delay: 0.55s; }
+    .feature-card .icon {
+      font-size: 2.15rem;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .feature-card p {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ----- Workflow ----- */
+    .workflow-sec {
+      padding: 80px 24px;
+      background: #fff;
+    }
+    .workflow-sec h2 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 48px;
+      text-align: center;
+    }
+    .workflow-diagram {
+      margin: 0 auto;
+      max-width: 100%;
+      padding: 24px 0;
+      overflow-x: auto;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0 12px;
+      align-items: start;
+    }
+    .workflow-rail {
+      grid-column: 1 / -1;
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0 12px;
+      margin-bottom: 8px;
+    }
+    .workflow-rail::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 4px;
+      background: #1a1a2e;
+      border-radius: 2px;
+      z-index: 0;
+    }
+    .workflow-rail .workflow-dot-wrap {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+    .workflow-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #1a1a2e;
+      flex-shrink: 0;
+    }
+    .workflow-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 0;
+    }
+    .workflow-arrow-down {
+      flex-shrink: 0;
+      width: 28px;
+      height: 32px;
+      margin-bottom: 6px;
+      color: #1a1a2e;
+    }
+    .workflow-box {
+      width: 100%;
+      min-width: 182px;
+      max-width: 182px;
+      padding: 20px 14px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      text-align: center;
+      line-height: 1.35;
+      background: #b8d4e8;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+    .workflow-sec.in-view .workflow-box {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .workflow-sec.in-view .workflow-col:nth-child(1) .workflow-box { transition-delay: 0.05s; }
+    .workflow-sec.in-view .workflow-col:nth-child(2) .workflow-box { transition-delay: 0.15s; }
+    .workflow-sec.in-view .workflow-col:nth-child(3) .workflow-box { transition-delay: 0.25s; }
+    .workflow-sec.in-view .workflow-col:nth-child(4) .workflow-box { transition-delay: 0.35s; }
+    .workflow-sec.in-view .workflow-col:nth-child(5) .workflow-box { transition-delay: 0.45s; }
+    .workflow-sec.in-view .workflow-col:nth-child(6) .workflow-box { transition-delay: 0.55s; }
+    .workflow-rail,
+    .workflow-arrow-down {
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+    }
+    .workflow-sec.in-view .workflow-rail,
+    .workflow-sec.in-view .workflow-arrow-down {
+      opacity: 1;
+    }
+    .workflow-sec.in-view .workflow-rail { transition-delay: 0s; }
+    .workflow-sec.in-view .workflow-col:nth-child(1) .workflow-arrow-down { transition-delay: 0.1s; }
+    .workflow-sec.in-view .workflow-col:nth-child(2) .workflow-arrow-down { transition-delay: 0.2s; }
+    .workflow-sec.in-view .workflow-col:nth-child(3) .workflow-arrow-down { transition-delay: 0.3s; }
+    .workflow-sec.in-view .workflow-col:nth-child(4) .workflow-arrow-down { transition-delay: 0.4s; }
+    .workflow-sec.in-view .workflow-col:nth-child(5) .workflow-arrow-down { transition-delay: 0.5s; }
+    .workflow-sec.in-view .workflow-col:nth-child(6) .workflow-arrow-down { transition-delay: 0.6s; }
+    .workflow-box.wf-teal { background: #7ec8e3; }
+    .workflow-box.wf-blue { background: #6b9bd1; }
+    .workflow-box.wf-periwinkle { background: #b8b8d4; }
+    @media (max-width: 900px) {
+      .workflow-diagram {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .workflow-rail {
+        grid-template-columns: repeat(6, 1fr);
+      }
+      .workflow-box { min-width: 160px; max-width: 200px; padding: 18px 12px; font-size: 0.95rem; }
+    }
+    @media (max-width: 600px) {
+      .workflow-diagram {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .workflow-rail {
+        display: none;
+      }
+      .workflow-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .workflow-box { min-width: 0; max-width: 260px; width: 100%; padding: 20px 16px; font-size: 1rem; }
+    }
+    /* ----- Tech Stack ----- */
+    .tech-sec {
+      padding: 80px 24px;
+    }
+    .tech-sec h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    .tech-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .tech-card {
+      background: var(--card);
+      padding: 20px 24px;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      min-width: 120px;
+    }
+    .tech-card .tech-logo {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tech-card .tech-logo img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .tech-card .tech-logo svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ----- UI Preview ----- */
+    .preview-sec {
+      padding: 80px 24px;
+      background: var(--card);
+    }
+    .preview-sec h2 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 48px;
+      text-align: center;
+    }
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .preview-box {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid rgba(0,0,0,0.35);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      background: #f5f5f5;
+    }
+    .preview-box img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 9/16;
+      object-fit: cover;
+      max-height: 420px;
+    }
+
+    /* ----- FYP Details ----- */
+    .fyp-sec {
+      padding: 80px 24px;
+    }
+    .fyp-sec h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    .fyp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .fyp-item {
+      background: var(--card);
+      padding: 20px 24px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .fyp-item .label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .fyp-item .value {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* ----- Footer ----- */
+    footer {
+      padding: 40px 24px;
+      text-align: center;
+      border-top: 1px solid var(--accent-light);
+    }
+    footer .name {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    footer .year {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* ----- Floating AI Chat ----- */
+    .chat-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9998;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: var(--gradient-cta);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(109, 91, 138, 0.4);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      font: inherit;
+    }
+    .chat-fab:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 24px rgba(109, 91, 138, 0.5);
+    }
+    .chat-fab svg {
+      width: 28px;
+      height: 28px;
+      fill: currentColor;
+    }
+    .chat-fab span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      border: 0;
+    }
+    .chat-panel-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.25);
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .chat-panel-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .chat-panel {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      z-index: 10000;
+      width: 100%;
+      max-width: 400px;
+      max-height: 85vh;
+      height: 560px;
+      background: var(--card);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .chat-panel.open {
+      transform: translateY(0);
+    }
+    .chat-panel-header {
+      padding: 16px 20px;
+      background: var(--gradient-cta);
+      color: #fff;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chat-panel-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .chat-panel-close {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      line-height: 1;
+      transition: background 0.2s;
+    }
+    .chat-panel-close:hover {
+      background: rgba(255,255,255,0.35);
+    }
+    .chat-panel-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chat-panel-msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .chat-panel-msg.user {
+      align-self: flex-end;
+      background: var(--accent);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-panel-msg.bot {
+      align-self: flex-start;
+      background: var(--accent-light);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-panel-input-wrap {
+      padding: 12px 16px 20px;
+      border-top: 1px solid var(--accent-light);
+    }
+    .chat-panel-input-wrap form {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .chat-panel-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--accent-light);
+      border-radius: 24px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    .chat-panel-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .chat-panel-send {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: var(--gradient-cta);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .chat-panel-send:hover {
+      opacity: 0.95;
+    }
+    .chat-panel-send:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .chat-panel-send svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    /* ----- Responsive ----- */
+    @media (max-width: 900px) {
+      .hero {
+        min-height: 75vh;
+        justify-content: center;
+        padding: 48px 24px 64px;
+      }
+      .hero-bg {
+        background-position: center center;
+      }
+      .hero-overlay {
+        background: linear-gradient(180deg, rgba(26,26,46,0.28) 0%, rgba(26,26,46,0.32) 50%, rgba(26,26,46,0.25) 100%);
+      }
+      .hero-content {
+        max-width: 100%;
+        text-align: center;
+      }
+      .hero-content .desc { margin-left: auto; margin-right: auto; }
+      .hero-btns { justify-content: center; }
+      .about-sec .wrap { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .preview-grid { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto; }
+      .fyp-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .hero-content h1 { font-size: 2rem; }
+      .hero-btns { flex-direction: column; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 1. Hero (save your banner image as hero-banner.png in this folder) -->
+  <section class="hero" id="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-overlay" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <div class="hero-content">
+        <h1>Addy</h1>
+        <p class="sub">Neuro-Nav</p>
+        <p class="tagline">Your Personal AI Companion for Emotional Well-Being</p>
+        <p class="desc">A 24/7 AI-powered web app for emotional support, mood tracking, and personalized mental health care.</p>
+        <div class="hero-btns">
+          <a href="#features" class="btn btn-primary">View Features</a>
+          <a href="#workflow" class="btn btn-secondary">Project Workflow</a>
+        </div>
+        <div class="hero-github-wrap">
+          <a href="https://github.com/mahnouor1/fyp" class="btn-github" target="_blank" rel="noopener noreferrer" aria-label="View project on GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. About -->
+  <section class="about-sec" id="about">
+    <div class="wrap">
+      <div>
+        <h2>About the Project</h2>
+        <p class="about-text">Addy is a 24/7 AI mental health and emotional well-being web app that provides emotional support, mood tracking, planning, productivity tools, and personalized care all in one place.</p>
+      </div>
+      <div class="about-chart-wrap">
+        <img src="emotion-distribution.png" alt="Emotion Distribution in Addy – pie chart showing distribution of emotions">
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Features -->
+  <section class="features-sec" id="features">
+    <div class="wrap">
+      <h2>Core Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="icon">💬</div>
+          <h3>AI Emotional Chat</h3>
+          <p>Conversations with Addy for support and mood-aware responses.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">😊</div>
+          <h3>Mood Detection (Face + Text)</h3>
+          <p>Face-api.js emotion analysis and text-based mood input.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">📈</div>
+          <h3>Mood Tracking</h3>
+          <p>Track emotional patterns over time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">🎤</div>
+          <h3>Voice Assistant</h3>
+          <p>Hands-free interaction with Addy.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">📝</div>
+          <h3>Writing + Summary Tools</h3>
+          <p>Articles, TL;DR, and PDF summarizer.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">📋</div>
+          <h3>Daily Reports</h3>
+          <p>Personalized daily mental health summaries.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Workflow -->
+  <section class="workflow-sec" id="workflow">
+    <div class="wrap">
+      <h2>Project Workflow</h2>
+      <div class="workflow-diagram" role="img" aria-label="Workflow: Login to Emotion Detection to Analysis to AI Chat to Dashboard to Features">
+        <div class="workflow-rail">
+          <div class="workflow-dot-wrap"><span class="workflow-dot" aria-hidden="true"></span></div>
+          <div class="workflow-dot-wrap"><span class="workflow-dot" aria-hidden="true"></span></div>
+          <div class="workflow-dot-wrap"><span class="workflow-dot" aria-hidden="true"></span></div>
+          <div class="workflow-dot-wrap"><span class="workflow-dot" aria-hidden="true"></span></div>
+          <div class="workflow-dot-wrap"><span class="workflow-dot" aria-hidden="true"></span></div>
+          <div class="workflow-dot-wrap"><span class="workflow-dot" aria-hidden="true"></span></div>
+        </div>
+        <div class="workflow-col">
+          <svg class="workflow-arrow-down" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="0" x2="12" y2="20"/><path d="M6 16l6 8 6-8"/></svg>
+          <div class="workflow-box" aria-label="Login">LOGIN</div>
+        </div>
+        <div class="workflow-col">
+          <svg class="workflow-arrow-down" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="0" x2="12" y2="20"/><path d="M6 16l6 8 6-8"/></svg>
+          <div class="workflow-box wf-teal" aria-label="Emotion Detection">Emotion<br>Detection</div>
+        </div>
+        <div class="workflow-col">
+          <svg class="workflow-arrow-down" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="0" x2="12" y2="20"/><path d="M6 16l6 8 6-8"/></svg>
+          <div class="workflow-box wf-blue" aria-label="Analysis">ANALYSIS</div>
+        </div>
+        <div class="workflow-col">
+          <svg class="workflow-arrow-down" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="0" x2="12" y2="20"/><path d="M6 16l6 8 6-8"/></svg>
+          <div class="workflow-box wf-teal" aria-label="AI Chat">AI CHAT</div>
+        </div>
+        <div class="workflow-col">
+          <svg class="workflow-arrow-down" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="0" x2="12" y2="20"/><path d="M6 16l6 8 6-8"/></svg>
+          <div class="workflow-box wf-periwinkle" aria-label="Dashboard">DASHBOARD</div>
+        </div>
+        <div class="workflow-col">
+          <svg class="workflow-arrow-down" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="0" x2="12" y2="20"/><path d="M6 16l6 8 6-8"/></svg>
+          <div class="workflow-box wf-blue" aria-label="Features">FEATURES</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Tech Stack -->
+  <section class="tech-sec" id="tech">
+    <div class="wrap">
+      <h2>Technology Stack</h2>
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="tech-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#E34F26" d="M1.5 0h21l-1.91 21.563L11.977 24l-8.565-2.438L1.5 0z"/><path fill="#FFF" d="M18.438 3.736l-1.399 15.467-6.064 1.688-6.04-1.682L3.864 3.736h14.574zM8.409 14.39l.198 2.366 2.37.66 2.37-.66.33-3.865H8.11l.206 2.41h5.033l.247 2.792-2.743.76-2.745-.76-.17-1.946H5.91l-.247 2.743 4.773 1.323 4.774-1.323.33-3.865H8.41l-.001-.001z"/></svg>
+          </div>
+          <span>HTML, CSS, JavaScript</span>
+        </div>
+        <div class="tech-card">
+          <div class="tech-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#F7DF1E" d="M0 0h24v24H0V0z"/><path fill="#000" d="M12.5 14.27c.28-.12.65-.27 1.07-.45.63-.27 1.17-.62 1.6-1.04.4-.4.71-.85.9-1.33.2-.5.3-1.04.3-1.62 0-.95-.24-1.7-.7-2.24-.48-.55-1.14-.83-2-.83-.66 0-1.22.16-1.68.48-.46.32-.8.76-1.02 1.32-.2.52-.3 1.1-.3 1.74h-2.1c0-.9.16-1.73.5-2.48.33-.75.8-1.4 1.4-1.94.6-.54 1.3-.97 2.1-1.27.8-.3 1.66-.45 2.58-.45.96 0 1.82.16 2.58.48.76.32 1.42.75 1.96 1.3.54.54.96 1.2 1.26 1.96.3.76.45 1.58.45 2.46 0 .58-.08 1.12-.24 1.62-.08.25-.2.5-.34.75-.14.25-.32.5-.54.74-.22.24-.48.47-.8.7-.3.22-.66.43-1.08.62-.3.14-.6.26-.9.35-.3.1-.58.16-.84.2h-2.9v1.94h4.22z"/></svg>
+          </div>
+          <span>face-api.js</span>
+        </div>
+        <div class="tech-card">
+          <div class="tech-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M12.48 2C6.36 2 2 6.36 2 12.48s4.36 10.48 10.48 10.48 10.48-4.36 10.48-10.48S18.6 2 12.48 2zm-1.17 15.52v-4.36H7.5v-2.2h3.81V7.5h2.2v5.46h3.81v2.2h-6.01v4.36h-2.2z"/></svg>
+          </div>
+          <span>Google Gemini API</span>
+        </div>
+        <div class="tech-card">
+          <div class="tech-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#000" d="M14.23 12.004a2.236 2.236 0 0 1-2.235 2.236 2.236 2.236 0 0 1-2.236-2.236 2.236 2.236 0 0 1 2.236-2.235 2.236 2.236 0 0 1 2.235 2.235zm2.648-10.69c-1.346 0-3.107.96-4.888 2.622-1.78-1.653-3.542-2.602-4.887-2.602-.41 0-.783.093-1.106.278-1.375.793-1.683 3.264-.973 6.365C1.98 8.917 0 10.42 0 12.004c0 1.59 1.99 3.097 5.043 4.03-.704 3.113-.39 5.588.988 6.38.32.187.69.275 1.102.275 1.345 0 3.107-.96 4.888-2.624 1.78 1.654 3.542 2.603 4.887 2.603.41 0 .783-.09 1.106-.275 1.374-.792 1.683-3.263.973-6.365C22.02 15.096 24 13.59 24 12.004c0-1.59-1.99-3.097-5.043-4.032.704-3.11.39-5.587-.988-6.38-.318-.184-.688-.277-1.092-.278zm-.005 1.09v.006c.225 0 .406.044.558.127.666.382.955 1.835.73 3.704-.054.46-.142.91-.25 1.345-1.2-.3-2.4-.645-3.53-1.03-.45-1.016-.75-2.036-.75-2.98 0-.91.23-1.68.69-2.217.36-.42.86-.63 1.44-.63zm-9.49 1.09c.58 0 1.08.21 1.44.63.46.538.69 1.307.69 2.218 0 .943-.3 1.963-.75 2.98-1.13.384-2.33.73-3.53 1.03-.108-.435-.196-.885-.25-1.345-.225-1.87.064-3.32.73-3.704.152-.083.333-.127.558-.127zm4.94 2.18c.35.01.68.08.98.2.96.38 1.6 1.27 1.77 2.46.17 1.2-.17 2.35-.97 3.2-.4.43-.86.76-1.36.98-.5.23-1.02.35-1.55.35-.53 0-1.05-.12-1.55-.35-.5-.22-.96-.55-1.36-.98-.8-.85-1.14-2-.97-3.2.17-1.19.81-2.08 1.77-2.46.3-.12.63-.19.98-.2zm0 1.12c-.25 0-.5.07-.73.2-.7.28-1.17.95-1.3 1.93-.13.98.1 1.92.63 2.65.26.36.58.65.94.86.36.2.75.33 1.15.38.4.05.8.02 1.17-.1.37-.12.7-.3 1-.52.53-.73.76-1.67.63-2.65-.13-.98-.6-1.65-1.3-1.93-.23-.13-.48-.2-.73-.2z"/></svg>
+          </div>
+          <span>Flask</span>
+        </div>
+        <div class="tech-card">
+          <div class="tech-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#00A8E1" d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45v6.9L12 18.82l-6.9-3.45v-6.9L12 4.18zM4 8.82l7 3.5v7.36l-7-3.5V8.82zm16 0v7.36l-7 3.5v-7.36l7-3.5z"/></svg>
+          </div>
+          <span>YOLOv8</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. UI Preview -->
+  <section class="preview-sec" id="preview">
+    <div class="wrap">
+      <h2>UI Preview</h2>
+      <div class="preview-grid">
+        <div class="preview-box"><img src="ui-preview-1.png" alt="Addy app – Emotion analysis result"></div>
+        <div class="preview-box"><img src="ui-preview-2.png" alt="Addy app – Dashboard"></div>
+        <div class="preview-box"><img src="ui-preview-3.png" alt="Addy app – Welcome to Addy"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. FYP Details -->
+  <section class="fyp-sec" id="fyp-details">
+    <div class="wrap">
+      <h2>FYP Details</h2>
+      <div class="fyp-grid">
+        <div class="fyp-item">
+          <div class="label">Project</div>
+          <div class="value">Addy – Your Personal AI Companion for Emotional Well-Being</div>
+        </div>
+        <div class="fyp-item">
+          <div class="label">Student</div>
+          <div class="value">Mahnoor Umar, Malaika Karim</div>
+        </div>
+        <div class="fyp-item">
+          <div class="label">Degree</div>
+          <div class="value">Bachelors in Computer Science</div>
+        </div>
+        <div class="fyp-item">
+          <div class="label">University</div>
+          <div class="value">Federal Urdu University of Arts, Sciences &amp; Technology</div>
+        </div>
+        <div class="fyp-item" style="grid-column: 1 / -1;">
+          <div class="label">Supervisor</div>
+          <div class="value">Ma'am Noshaba</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Floating AI Chat (bottom right) – opens in-page panel -->
+  <button type="button" class="chat-fab" id="chat-fab-btn" aria-label="Open AI Chat – chat with Addy in real time">
+    <span>Open AI Chat</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
+  </button>
+
+  <!-- In-page chat panel (slides up, stays on website) -->
+  <div class="chat-panel-backdrop" id="chat-backdrop" aria-hidden="true"></div>
+  <div class="chat-panel" id="chat-panel" role="dialog" aria-label="Chat with Addy" aria-hidden="true">
+    <div class="chat-panel-header">
+      <h3>Chat with Addy</h3>
+      <button type="button" class="chat-panel-close" id="chat-panel-close" aria-label="Close chat">&times;</button>
+    </div>
+    <div class="chat-panel-messages" id="chat-panel-messages">
+      <div class="chat-panel-msg bot">Hi! I'm Addy, your AI companion. How can I support you today?</div>
+    </div>
+    <div class="chat-panel-input-wrap">
+      <form id="chat-panel-form">
+        <input type="text" class="chat-panel-input" id="chat-panel-input" placeholder="Type your message..." autocomplete="off">
+        <button type="submit" class="chat-panel-send" id="chat-panel-send" aria-label="Send">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. Footer -->
+  <footer>
+    <div class="name">Addy (Neuro-Nav)</div>
+    <div class="year">Final Year Project – 2026</div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        var id = this.getAttribute('href').slice(1);
+        if (!id) return;
+        var el = document.getElementById(id);
+        if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      });
+    });
+    (function() {
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+      var featuresSec = document.getElementById('features');
+      if (featuresSec) observer.observe(featuresSec);
+      var workflowSec = document.getElementById('workflow');
+      if (workflowSec) observer.observe(workflowSec);
+    })();
+
+    (function() {
+      var GEMINI_API_KEY = 'AIzaSyBHVcKl7l5qJxcXx2oin1_eHv2Ds2Ub7P4';
+      var GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+      var fab = document.getElementById('chat-fab-btn');
+      var backdrop = document.getElementById('chat-backdrop');
+      var panel = document.getElementById('chat-panel');
+      var closeBtn = document.getElementById('chat-panel-close');
+      var form = document.getElementById('chat-panel-form');
+      var input = document.getElementById('chat-panel-input');
+      var sendBtn = document.getElementById('chat-panel-send');
+      var messagesEl = document.getElementById('chat-panel-messages');
+      var isProcessing = false;
+
+      function openChat() {
+        backdrop.classList.add('open');
+        panel.classList.add('open');
+        panel.setAttribute('aria-hidden', 'false');
+        backdrop.setAttribute('aria-hidden', 'false');
+        input.focus();
+      }
+      function closeChat() {
+        backdrop.classList.remove('open');
+        panel.classList.remove('open');
+        panel.setAttribute('aria-hidden', 'true');
+        backdrop.setAttribute('aria-hidden', 'true');
+      }
+
+      if (fab) fab.addEventListener('click', openChat);
+      if (closeBtn) closeBtn.addEventListener('click', closeChat);
+      if (backdrop) backdrop.addEventListener('click', closeChat);
+
+      function addChatMsg(text, isUser) {
+        var div = document.createElement('div');
+        div.className = 'chat-panel-msg ' + (isUser ? 'user' : 'bot');
+        div.textContent = text;
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      function setThinking(show) {
+        var last = messagesEl.lastChild;
+        if (show) {
+          addChatMsg('Addy is thinking...', false);
+          return;
+        }
+        if (last && last.textContent === 'Addy is thinking...') {
+          last.remove();
+        }
+      }
+
+      function fetchGemini(userMessage) {
+        return fetch(GEMINI_API_URL + '?key=' + encodeURIComponent(GEMINI_API_KEY), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: userMessage }] }]
+          })
+        }).then(function(res) {
+          if (!res.ok) throw new Error('API_ERROR_' + res.status);
+          return res.json();
+        }).then(function(data) {
+          if (data.error) throw new Error(data.error.message || 'Unknown error');
+          return (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) ? data.candidates[0].content.parts[0].text : 'Sorry, I could not get a response.';
+        });
+      }
+
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          if (isProcessing) return;
+          var msg = (input.value || '').trim();
+          if (!msg) return;
+          isProcessing = true;
+          sendBtn.disabled = true;
+          addChatMsg(msg, true);
+          input.value = '';
+          setThinking(true);
+          fetchGemini(msg).then(function(reply) {
+            setThinking(false);
+            addChatMsg(reply, false);
+          }).catch(function() {
+            setThinking(false);
+            addChatMsg('Sorry, there was an error connecting to Addy. Please try again.', false);
+          }).then(function() {
+            isProcessing = false;
+            sendBtn.disabled = false;
+            input.focus();
+          });
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
