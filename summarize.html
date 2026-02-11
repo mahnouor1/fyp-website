@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Summarize - Addy</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <style>
+    :root { --footer-nav-height: 64px; }
+    .mobile-container {
+      padding-bottom: calc(var(--footer-nav-height) + env(safe-area-inset-bottom));
+      box-sizing: border-box;
+    }
+    
+    .summarize-layout {
+      display: flex;
+      gap: 16px;
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      flex-direction: column;
+    }
+    
+    @media (min-width: 768px) {
+      .summarize-layout {
+        flex-direction: row;
+        max-width: 900px;
+        align-items: flex-start;
+      }
+      .input-section, .output-section {
+        flex: 1;
+      }
+    }
+    
+    .input-section, .output-section {
+      width: 100%;
+    }
+    
+    .output-section {
+      display: none;
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    
+    .output-section.visible {
+      display: block;
+      animation: popUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    
+    @keyframes popUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    #summarizeResult {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 80px;
+      margin-bottom: 12px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      line-height: 1.6;
+    }
+    
+    .result-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .action-btn {
+      flex: 1;
+      min-width: 100px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .copy-btn {
+      background: #0D6EFD;
+      color: white;
+    }
+    
+    .copy-btn:hover {
+      background: #0b5ed7;
+      transform: translateY(-1px);
+    }
+    
+    .clear-btn {
+      background: #f8f9fa;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+    
+    .clear-btn:hover {
+      background: #e9ecef;
+    }
+    
+    .pdf-btn {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .pdf-btn:hover {
+      background: #bb2d3b;
+      transform: translateY(-1px);
+    }
+    
+    .action-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+    
+    .primary-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+
+</head>
+<body>
+  <div class="mobile-container">
+    <a href="welcome.html" class="home-btn" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div class="assessment-header">
+      <button class="arrow-btn left-arrow" onclick="window.location.href='assessment.html#dashboardPage'">&#8592;</button>
+      <span class="assessment-title">Summarize (TL;DR)</span>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding-bottom:90px;box-sizing:border-box;">
+      <h2 style="text-align:center;margin-bottom:18px;padding-top:24px;">Let Addy summarize your text!</h2>
+      <div class="summarize-layout">
+        <div class="input-section">
+          <form id="summarizeForm" style="margin-bottom:18px;">
+            <label style="display:block;margin-bottom:8px;font-weight:600;">Paste text to summarize:</label>
+            <textarea id="summarizeInput" required style="width:100%;padding:12px;border-radius:8px;border:1px solid #ccc;min-height:200px;box-sizing:border-box;font-family:inherit;resize:vertical;"></textarea>
+            <button type="submit" class="primary-btn" style="margin-top:12px;width:100%;">Summarize</button>
+          </form>
+        </div>
+        
+        <div class="output-section" id="outputSection">
+          <label style="display:block;margin-bottom:8px;font-weight:600;">Summary:</label>
+          <div id="summarizeResult"></div>
+          <div class="result-actions">
+            <button class="action-btn copy-btn" id="copyBtn">
+              <span>📋</span> Copy
+            </button>
+            <button class="action-btn clear-btn" id="clearBtn">
+              <span>🗑️</span> Clear
+            </button>
+            <button class="action-btn pdf-btn" id="pdfBtn">
+              <span>📄</span> Save PDF
+            </button>
+          </div>
+        </div>
+      </div>
+      <button id="summarizeContinueBtn" class="primary-btn" style="margin:32px auto 0 auto;display:block;max-width:420px;width:calc(100% - 32px);">Continue</button>
+    </div>
+  </div>
+  <div class="footer-nav">
+    <a href="chat.html" class="nav-item">
+      <div class="nav-icon">💬</div>
+      <span>Chat</span>
+    </a>
+    <a href="assessment.html#dashboardPage" class="nav-item active" >
+      <div class="nav-icon">📊</div>
+      <span>Dashboard</span>
+    </a>
+    <a href="planner.html" class="nav-item">
+      <div class="nav-icon">📅</div>
+      <span>Planner</span>
+    </a>
+    <a href="account.html" class="nav-item">
+      <div class="nav-icon">👤</div>
+      <span>Account</span>
+    </a>
+  </div>
+  <style>
+    .footer-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10000;
+      max-width: 100%;
+      width: 100%;
+      margin: 0;
+      background: #fff;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 0;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #666;
+      font-size: 0.8em;
+      flex: 1;
+      padding: 4px 0;
+    }
+    .nav-item.active {
+      color: #2979ff;
+    }
+    .nav-icon {
+      font-size: 1.5em;
+      margin-bottom: 4px;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const summarizeForm = document.getElementById('summarizeForm');
+    const summarizeInput = document.getElementById('summarizeInput');
+    const summarizeResult = document.getElementById('summarizeResult');
+    const outputSection = document.getElementById('outputSection');
+    const copyBtn = document.getElementById('copyBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const pdfBtn = document.getElementById('pdfBtn');
+    const summarizeBtn = summarizeForm.querySelector('button[type="submit"]');
+    
+    const GEMINI_API_KEY = "AIzaSyBHVcKl7l5qJxcXx2oin1_eHv2Ds2Ub7P4";
+    const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+    let isProcessing = false;
+    
+    async function fetchSummary(text) {
+      const resp = await fetch(GEMINI_API_URL + `?key=${GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: `Summarize this text in a supportive, clear way for emotional well-being:\n${text}` }] }]
+        })
+      });
+
+      if (!resp.ok) {
+        throw new Error(`API_ERROR_${resp.status}`);
+      }
+
+      const data = await resp.json();
+      
+      // Check for API errors in response
+      if (data.error) {
+        throw new Error(`API_ERROR: ${data.error.message || 'Unknown error'}`);
+      }
+
+      // Extract summary from response
+      if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+        return data.candidates[0].content.parts.map(p => p.text).join(' ');
+      }
+      
+      return 'Sorry, could not summarize.';
+    }
+    
+    summarizeForm.onsubmit = async function(e) {
+      e.preventDefault();
+      
+      // Prevent multiple simultaneous requests
+      if (isProcessing) {
+        return;
+      }
+      
+      const text = summarizeInput.value.trim();
+      if (!text) return;
+      
+      isProcessing = true;
+      summarizeBtn.disabled = true;
+      
+      // Show output section immediately with loading state
+      summarizeResult.textContent = 'Summarizing...';
+      summarizeResult.style.background = '#f8f9fa';
+      summarizeResult.style.border = 'none';
+      summarizeResult.style.color = '#333';
+      outputSection.style.display = 'block';
+      // Force reflow to ensure display change is applied
+      outputSection.offsetHeight;
+      outputSection.classList.add('visible');
+      
+      // Scroll to output on mobile
+      if (window.innerWidth < 768) {
+        setTimeout(() => {
+          outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }
+      
+      try {
+        const summary = await fetchSummary(text);
+        
+        // Update result - animation already triggered by visible class
+        summarizeResult.textContent = summary;
+        summarizeResult.style.background = '#f8f9fa';
+        summarizeResult.style.border = 'none';
+        summarizeResult.style.color = '#333';
+      } catch (error) {
+        summarizeResult.textContent = 'Error: Could not generate summary. Please try again.';
+        summarizeResult.style.background = '#fff3cd';
+        summarizeResult.style.border = '1px solid #ffc107';
+        summarizeResult.style.color = '#856404';
+        console.error('Summarize error:', error);
+      } finally {
+        isProcessing = false;
+        summarizeBtn.disabled = false;
+      }
+    };
+    
+    // Copy button functionality
+    copyBtn.onclick = function() {
+      const text = summarizeResult.textContent;
+      if (text && text !== 'Summarizing...' && !text.includes('Error:')) {
+        navigator.clipboard.writeText(text).then(() => {
+          const originalText = copyBtn.innerHTML;
+          copyBtn.innerHTML = '<span>✓</span> Copied!';
+          copyBtn.style.background = '#28a745';
+          setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.background = '#0D6EFD';
+          }, 2000);
+        }).catch(() => {
+          alert('Failed to copy text');
+        });
+      }
+    };
+    
+    // Clear button functionality
+    clearBtn.onclick = function() {
+      summarizeResult.textContent = '';
+      summarizeInput.value = '';
+      outputSection.classList.remove('visible');
+      setTimeout(() => {
+        outputSection.style.display = 'none';
+      }, 300);
+    };
+    
+    // Clear any stored cooldown from localStorage
+    localStorage.removeItem('gemini_rate_limit_cooldown');
+    
+    // Save as PDF button functionality
+    pdfBtn.onclick = function() {
+      const text = summarizeResult.textContent;
+      if (!text || text === 'Summarizing...' || text.includes('Error:')) {
+        alert('No summary to save');
+        return;
+      }
+      
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        alert('PDF library not loaded. Please try again.');
+        return;
+      }
+      
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text('Summary', 20, 20);
+      doc.setFontSize(12);
+      const splitText = doc.splitTextToSize(text, 170);
+      doc.text(splitText, 20, 40);
+      doc.save('summary.pdf');
+    };
+    
+    document.getElementById('summarizeContinueBtn').onclick = function() {
+      window.location.href = 'assessment.html#dashboardPage';
+    };
+  </script>
+</body>
+</html> 

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voice Assistant - Addy</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <style>
+    :root { --footer-nav-height: 64px; }
+    .mobile-container {
+      padding-bottom: calc(var(--footer-nav-height) + env(safe-area-inset-bottom));
+      box-sizing: border-box;
+    }
+    .voice-title-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .voice-title-wrap h2 {
+      margin: 0;
+      text-align: center;
+    }
+    .voice-icon-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #6d5b8a 0%, #8b7aa8 100%);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(109, 91, 138, 0.35);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .voice-icon-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 6px 18px rgba(109, 91, 138, 0.45);
+    }
+    .voice-icon-btn:active {
+      transform: scale(0.98);
+    }
+    .voice-icon-btn svg {
+      width: 26px;
+      height: 26px;
+    }
+    .voice-icon-btn.active {
+      background: linear-gradient(135deg, #8b5a2b 0%, #a0522d 100%);
+      animation: voice-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes voice-pulse {
+      0%, 100% { box-shadow: 0 4px 14px rgba(139, 90, 43, 0.4); }
+      50% { box-shadow: 0 4px 20px rgba(139, 90, 43, 0.6); }
+    }
+  </style>
+
+</head>
+<body>
+  <div class="mobile-container">
+    <a href="welcome.html" class="home-btn" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div class="assessment-header">
+      <button class="arrow-btn left-arrow" onclick="window.location.href='assessment.html#dashboardPage'">&#8592;</button>
+      <span class="assessment-title">Voice Assistant</span>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:24px 0 90px 0;max-width:411px;margin:0 auto;">
+      <div class="voice-title-wrap">
+        <h2 style="text-align:center;">Talk to Addy hands-free!</h2>
+        <button type="button" class="voice-icon-btn" id="vapiVoiceBtn" aria-label="Start voice conversation with Addy" title="Click to talk to Addy">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+        </button>
+      </div>
+      <form id="voiceForm" style="margin-bottom:18px;">
+        <label>Type your request (voice coming soon):<br><input type="text" id="voiceInput" required style="width:100%;padding:12px;border-radius:8px;border:1px solid #ccc;"></label>
+        <button type="submit" class="primary-btn" style="margin-top:12px;width:100%;">Ask Addy</button>
+      </form>
+      <div id="voiceResult" style="background:#f8f9fa;border-radius:12px;padding:16px;min-height:80px;"></div>
+      <button id="voiceContinueBtn" class="primary-btn" style="margin:32px auto 0 auto;display:block;">Continue</button>
+    </div>
+  </div>
+  <div class="footer-nav">
+    <a href="chat.html" class="nav-item">
+      <div class="nav-icon">💬</div>
+      <span>Chat</span>
+    </a>
+    <a href="assessment.html#dashboardPage" class="nav-item active" >
+      <div class="nav-icon">📊</div>
+      <span>Dashboard</span>
+    </a>
+    <a href="planner.html" class="nav-item">
+      <div class="nav-icon">📅</div>
+      <span>Planner</span>
+    </a>
+    <a href="account.html" class="nav-item">
+      <div class="nav-icon">👤</div>
+      <span>Account</span>
+    </a>
+  </div>
+  <style>
+    .footer-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10000;
+      max-width: 411px;
+      width: 100%;
+      margin: 0 auto;
+      background: #fff;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 0;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #666;
+      font-size: 0.8em;
+      flex: 1;
+      padding: 4px 0;
+    }
+    .nav-item.active {
+      color: #2979ff;
+    }
+    .nav-icon {
+      font-size: 1.5em;
+      margin-bottom: 4px;
+    }
+    @media (max-width: 500px) {
+      .mobile-container, .footer-nav { max-width: 100vw !important; }
+    }
+  </style>
+  <script type="module">
+    var VAPI_PUBLIC_KEY = '29fc60ea-43b6-41ea-b623-e007711924fe';
+    var VAPI_ASSISTANT_ID = '103eeaf4-ddc5-4605-9d19-6b6e6fd88c3a';
+
+    var isFileProtocol = (typeof location !== 'undefined' && location.protocol === 'file:');
+    var isSecure = typeof window !== 'undefined' && window.isSecureContext;
+
+    if (isFileProtocol || !isSecure) {
+      window.startAddyVoice = function() {
+        alert('Voice assistant cannot run from a local file (file://).\n\nPlease run a local web server from your project folder:\n\n  python -m http.server 8000\n\nThen open in your browser:\n  http://localhost:8000/voice-assistant.html');
+      };
+    } else {
+      try {
+        var Vapi = (await import('https://esm.sh/@vapi-ai/web')).default;
+        var vapi = new Vapi(VAPI_PUBLIC_KEY);
+        var voiceBtn = document.getElementById('vapiVoiceBtn');
+        var callActive = false;
+        vapi.on('call-start', function() {
+          callActive = true;
+          if (voiceBtn) voiceBtn.classList.add('active');
+        });
+        vapi.on('call-end', function() {
+          callActive = false;
+          if (voiceBtn) voiceBtn.classList.remove('active');
+        });
+        vapi.on('error', function() {
+          callActive = false;
+          if (voiceBtn) voiceBtn.classList.remove('active');
+        });
+        window.startAddyVoice = function() {
+          if (callActive) return;
+          try {
+            vapi.start(VAPI_ASSISTANT_ID);
+          } catch (err) {
+            console.error('VAPI start error:', err);
+            alert('Could not start voice. Please try again.');
+          }
+        };
+      } catch (e) {
+        console.error('VAPI SDK load error:', e);
+        window.startAddyVoice = function() {
+          alert('Voice assistant failed to load. Please refresh the page.');
+        };
+      }
+    }
+  </script>
+  <script>
+    (function() {
+      var voiceBtn = document.getElementById('vapiVoiceBtn');
+      if (voiceBtn) {
+        voiceBtn.addEventListener('click', function() {
+          if (window.startAddyVoice) window.startAddyVoice();
+        });
+      }
+    })();
+
+    document.getElementById('voiceForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const prompt = document.getElementById('voiceInput').value.trim();
+      if (!prompt) return;
+      document.getElementById('voiceResult').textContent = 'Addy is thinking...';
+      const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBHVcKl7l5qJxcXx2oin1_eHv2Ds2Ub7P4', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: `You are Addy, a supportive voice assistant. ${prompt}` }] }]
+        })
+      });
+      const data = await resp.json();
+      let result = 'Sorry, could not get a response.';
+      if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+        result = data.candidates[0].content.parts.map(p => p.text).join(' ');
+      }
+      document.getElementById('voiceResult').textContent = result;
+    };
+    document.getElementById('voiceContinueBtn').onclick = function() {
+      window.location.href = 'assessment.html#dashboardPage';
+    };
+  </script>
+</body>
+</html> 

@@ -1,0 +1,2369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Assessment - Neuro-Nav</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    /* Mobile Container Styles */
+    .mobile-container {
+      width: 100%;
+      max-width: 100%;
+      height: 100vh;
+      position: relative;
+      top: 0;
+      left: 0;
+      transform: none;
+      background: #fff;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #resultPage {
+      overflow-y: auto;
+      padding-bottom: 84px; /* keep buttons above fixed footer */
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .assessment-container {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 0 18px 64px 18px;
+      box-sizing: border-box;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+    }
+    
+    /* Photo Modal Styles */
+    .photo-modal {
+      position: fixed; left: 0; right: 0; bottom: 0; top: 0;
+      background: rgba(0,0,0,0.18); z-index: 1000; display: flex; align-items: flex-end; justify-content: center;
+    }
+    .photo-modal-content {
+      max-width: 411px;
+      width: 100%;
+      margin: 0 auto;
+      background: #fff; border-radius: 24px 24px 0 0; padding: 32px 0 16px 0; box-shadow: 0 -2px 16px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .photo-modal-title { font-size: 1.3em; font-weight: 500; margin-bottom: 18px; color: #666; }
+    .photo-modal-options { display: flex; justify-content: space-around; margin-bottom: 18px; }
+    .photo-modal-btn { background: none; border: none; font-size: 1em; color: #222; outline: none; cursor: pointer; }
+    .photo-modal-icon { font-size: 2em; }
+    .photo-modal-cancel {
+      background: #000000; color: #fff; border: none; border-radius: 24px; padding: 12px 0; width: 90%; font-size: 1.1em; font-weight: 500; margin: 0 auto; display: block; cursor: pointer;
+    }
+
+    /* Live Video Interface Styles */
+    .live-content {
+      width: 100%;
+      max-width: 411px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: calc(100vh - 120px); /* Account for header and continue button */
+      overflow: hidden; /* Prevent content scrolling */
+      padding-bottom: 64px; /* Add padding to prevent content from being hidden behind footer */
+    }
+
+    .live-video-container {
+      position: relative;
+      width: 100%;
+      height: 35vh; /* Reduce height to percentage of viewport */
+      min-height: 220px; /* Minimum height */
+      max-height: 280px; /* Maximum height */
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    #liveVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #liveCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .live-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      z-index: 2;
+    }
+
+    .live-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,0,0,0.5);
+      padding: 6px 10px;
+      border-radius: 16px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+
+    .live-indicator {
+      width: 8px;
+      height: 8px;
+      background: #ff4444;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .live-mood-text {
+      background: rgba(0,0,0,0.5);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 16px;
+      font-weight: 500;
+      font-size: 0.9em;
+    }
+
+    .live-chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #f8f9fa;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      max-height: calc(65vh - 140px); /* Remaining space minus buttons/padding */
+    }
+
+    .live-chat-messages {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+    }
+
+    .live-chat-input {
+      display: flex;
+      gap: 8px;
+      padding: 10px;
+      background: white;
+      border-top: 1px solid #eee;
+    }
+
+    .live-chat-input input {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 20px;
+      background: #f0f2f5;
+      font-size: 0.95em;
+    }
+
+    .live-chat-input button {
+      width: 38px;
+      height: 38px;
+      border: none;
+      border-radius: 50%;
+      background: #000000;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .live-chat-input button:hover {
+      background: #2462cc;
+    }
+
+    .live-continue-btn {
+      width: calc(100% - 24px);
+      margin: 12px;
+      padding: 14px;
+      border: none;
+      border-radius: 20px;
+      background: #000;
+      color: white;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .live-continue-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Message Bubbles - More Compact */
+    .message {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.95em;
+      line-height: 1.3;
+      position: relative;
+      word-wrap: break-word;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: #000000;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.bot {
+      align-self: flex-start;
+      background: white;
+      color: #333;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    /* Assessment Header - More Compact */
+    .assessment-header {
+      width: 100%;
+      max-width: 411px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .live-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      z-index: 2;
+    }
+
+    .live-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,0,0,0.5);
+      padding: 6px 10px;
+      border-radius: 16px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+
+    .live-mood-text {
+      background: rgba(0,0,0,0.5);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 16px;
+      font-weight: 500;
+      font-size: 0.9em;
+    }
+
+    /* Ensure video fills container */
+    #liveVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #liveCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* Fix iOS height issues */
+    @supports (-webkit-touch-callout: none) {
+      .mobile-container {
+        height: -webkit-fill-available;
+      }
+      .live-content {
+        height: calc(100vh - 120px - env(safe-area-inset-bottom));
+      }
+    }
+
+    /* Message Bubbles */
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 20px;
+      font-size: 1em;
+      line-height: 1.4;
+      position: relative;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: #000000;
+      color: white;
+      border-bottom-right-radius: 5px;
+    }
+
+    .message.bot {
+      align-self: flex-start;
+      background: white;
+      color: #333;
+      border-bottom-left-radius: 5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    @media (max-width: 411px) {
+      .mobile-container,
+      .assessment-container,
+      .photo-modal-content,
+      .assessment-header,
+      .live-content {
+        max-width: 100%;
+      }
+    }
+
+    /* Back Button Styling */
+    .arrow-btn {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 56px;
+      width: 56px;
+      border: none;
+      background: none;
+      font-size: 24px;
+      color: #333;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 11;
+      padding: 0;
+      transition: background-color 0.2s;
+    }
+
+    .arrow-btn:active {
+      background-color: rgba(0,0,0,0.05);
+    }
+
+    /* Adjust header title to account for back button */
+    .assessment-header {
+      position: relative;
+    }
+
+    .assessment-title {
+      flex: 1;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.2em;
+      margin: 0 48px; /* Make space for back button */
+    }
+
+    /* Add these new styles */
+    .primary-btn {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        background: #000000;
+        color: white;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .primary-btn:active {
+        background: #000000;
+    }
+
+    .secondary-btn {
+        width: 100%;
+        padding: 16px;
+        border: 2px solid #000000;
+        border-radius: 12px;
+        background: white;
+        color: #000000;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .secondary-btn:active {
+        background: #f0f7ff;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .input-group label {
+        font-size: 0.9em;
+        font-weight: 600;
+        color: #444;
+    }
+
+    .input-group input {
+        padding: 12px 16px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        font-size: 1em;
+        transition: border-color 0.2s;
+    }
+
+    .input-group input:focus {
+        border-color: #000000;
+        outline: none;
+    }
+
+    /* Live Continue Button Styles */
+    .live-continue-btn {
+      width: calc(100% - 24px);
+      margin: 12px;
+    }
+
+    /* Footer Navigation Styles */
+    .footer-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10000;
+        max-width: 411px;
+        margin: 0 auto;
+        background: white;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: space-around;
+        padding: 8px 0;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: #666;
+        font-size: 0.8em;
+        padding: 4px 0;
+    }
+
+    .nav-item.active {
+        color: #000000;
+    }
+
+    .nav-icon {
+        font-size: 1.5em;
+        margin-bottom: 4px;
+    }
+
+    /* Add modal styles and modal HTML for editing */
+    .modal-bg {
+      position: fixed; left: 0; top: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.18); z-index: 2000; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-content {
+      background: #fff; border-radius: 18px; padding: 32px 24px; min-width: 280px; max-width: 90vw; box-shadow: 0 2px 24px #0002; text-align: center;
+    }
+    .modal-content input, .modal-content select {
+      width: 90%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 1.1em; margin-bottom: 18px;
+    }
+    .modal-actions { display: flex; gap: 16px; justify-content: center; }
+    .modal-btn { padding: 10px 24px; border-radius: 8px; border: none; font-size: 1em; cursor: pointer; }
+    .modal-btn.save { background: #000000; color: #fff; }
+    .modal-btn.cancel { background: #eee; color: #333; }
+
+    /* Mood Selector Styles */
+    .mood-selector {
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .mood-path {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .mood-zigzag {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .mood-step {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      background: white;
+      border: 3px solid #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 2;
+    }
+
+    .mood-step:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .mood-step.active {
+      background: #000;
+      color: white;
+    }
+
+    .mood-step svg {
+      width: 32px;
+      height: 32px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .mood-step.active svg {
+      stroke: white;
+    }
+
+    .mood-connector {
+      position: absolute;
+      width: 3px;
+      background: #000;
+      z-index: 1;
+    }
+
+    .mood-label {
+      position: absolute;
+      font-size: 0.9em;
+      font-weight: 500;
+      color: #666;
+      white-space: nowrap;
+    }
+
+    .mood-step:hover .mood-label {
+      color: #000;
+    }
+
+    .mood-step.active .mood-label {
+      color: #000;
+      font-weight: 600;
+    }
+
+    /* Custom SVG Icons */
+    .mood-icon-happy {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 0;
+      animation: draw 1s ease forwards;
+    }
+
+    .mood-icon-calm {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 0;
+      animation: draw 1s ease forwards;
+    }
+
+    .mood-icon-neutral {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 0;
+      animation: draw 1s ease forwards;
+    }
+
+    .mood-icon-anxious {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 0;
+      animation: draw 1s ease forwards;
+    }
+
+    .mood-icon-sad {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 0;
+      animation: draw 1s ease forwards;
+    }
+
+    @keyframes draw {
+      from {
+        stroke-dashoffset: 100;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  </style>
+
+  <style>
+    :root { --footer-nav-height: 64px; }
+    .mobile-container {
+      padding-bottom: calc(var(--footer-nav-height) + env(safe-area-inset-bottom));
+      box-sizing: border-box;
+    }
+  </style>
+
+</head>
+<body>
+  <!-- Welcome Page -->
+  <div id="welcomePage" class="mobile-container">
+    <a href="#" class="home-btn" onclick="showPage('welcomePage'); return false;" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div style="width: 100%; max-width: 420px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; padding: 24px 18px 80px 18px; box-sizing: border-box;">
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+            <div style="font-size: 2.5em; margin-bottom: 16px;">👋</div>
+            <h1 style="font-size: 1.7em; margin-bottom: 12px; font-weight: 700;">Welcome to Addy</h1>
+            <p style="color: #666; font-size: 1em; margin-bottom: 28px; line-height: 1.4;">Your personal AI companion for emotional well-being</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button onclick="showPage('loginPage')" class="primary-btn">Login</button>
+            <button onclick="showPage('signupPage')" class="secondary-btn">Create Account</button>
+            <button onclick="tryDemo()" class="secondary-btn" style="background:#eaf4ff;color:#000;">Try Demo</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- Login Page -->
+  <div id="loginPage" class="mobile-container" style="display: none;">
+    <a href="#" class="home-btn" onclick="showPage('welcomePage'); return false;" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div class="assessment-header">
+        <button class="arrow-btn left-arrow" onclick="showPage('welcomePage')">&#8592;</button>
+        <span class="assessment-title">Login</span>
+    </div>
+    <div style="width: 100%; max-width: 420px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; padding: 24px 18px 80px 18px; box-sizing: border-box;">
+        <div style="flex: 1;">
+            <form id="loginForm" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; gap: 18px;">
+                <div class="input-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required placeholder="Enter your email">
+                </div>
+                <div class="input-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="primary-btn">Login</button>
+            </form>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="#" onclick="showPage('forgotPasswordPage')" style="color: #000000; text-decoration: none;">Forgot Password?</a>
+            </div>
+        </div>
+        <div style="text-align: center; padding: 16px 0;">
+            <span style="color: #666;">Don't have an account? </span>
+            <a href="#" onclick="showPage('signupPage')" style="color: #000000; text-decoration: none;">Sign Up</a>
+        </div>
+    </div>
+  </div>
+
+  <!-- Signup Page -->
+  <div id="signupPage" class="mobile-container" style="display: none;">
+    <a href="#" class="home-btn" onclick="showPage('welcomePage'); return false;" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div class="assessment-header">
+        <button class="arrow-btn left-arrow" onclick="showPage('welcomePage')">&#8592;</button>
+        <span class="assessment-title">Create Account</span>
+    </div>
+    <div style="width: 100%; max-width: 420px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; padding: 24px 18px 80px 18px; box-sizing: border-box; overflow-y: auto;">
+        <div style="flex: 1;">
+            <form id="signupForm" onsubmit="handleSignup(event)" style="display: flex; flex-direction: column; gap: 18px;">
+                <div class="input-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required placeholder="Enter your full name">
+                </div>
+                <div class="input-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required placeholder="Enter your email">
+                </div>
+                <div class="input-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required placeholder="Create a password">
+                </div>
+                <div class="input-group">
+                    <label for="signupConfirmPassword">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" required placeholder="Confirm your password">
+                </div>
+                <button type="submit" class="primary-btn">Create Account</button>
+            </form>
+        </div>
+        <div style="text-align: center; padding: 16px 0;">
+            <span style="color: #666;">Already have an account? </span>
+            <a href="#" onclick="showPage('loginPage')" style="color: #000000; text-decoration: none;">Login</a>
+        </div>
+    </div>
+  </div>
+
+  <div id="assessmentPage" class="mobile-container" style="display:none;">
+    <a href="#" class="home-btn" onclick="showPage('welcomePage'); return false;" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div class="assessment-container">
+      <div class="assessment-header">
+        <button class="arrow-btn left-arrow" id="backBtn">&#8592;</button>
+        <span class="assessment-title">Setup Profile</span>
+      </div>
+      <div id="assessmentStep"></div>
+      <button class="assessment-continue" id="continueBtn">Continue <span style="font-size:1.2em;">→</span></button>
+    </div>
+  </div>
+  <div class="footer-nav">
+    <a href="chat.html" class="nav-item">
+        <div class="nav-icon">💬</div>
+        <span>Chat</span>
+    </a>
+    <a href="#dashboardPage" class="nav-item" onclick="showDashboardPage(); return false;">
+        <div class="nav-icon">📊</div>
+        <span>Dashboard</span>
+    </a>
+    <a href="planner.html" class="nav-item">
+        <div class="nav-icon">📅</div>
+        <span>Planner</span>
+    </a>
+    <a href="account.html" class="nav-item">
+        <div class="nav-icon">👤</div>
+        <span>Account</span>
+    </a>
+  </div>
+  <!-- Camera/Gallery Modal -->
+  <div id="photoModal" class="photo-modal" style="display:none;">
+    <div class="photo-modal-content">
+      <div class="photo-modal-title">Choose from</div>
+      <div class="photo-modal-options">
+        <button class="photo-modal-btn" id="cameraBtn">
+          <span class="photo-modal-icon">📷</span><br>Camera
+        </button>
+        <button class="photo-modal-btn" id="galleryBtn">
+          <span class="photo-modal-icon">🖼️</span><br>Gallery
+        </button>
+        <button class="photo-modal-btn" id="liveBtn">
+          <span class="photo-modal-icon">🎥</span><br>Live Interaction
+        </button>
+      </div>
+      <button class="photo-modal-cancel" id="photoModalCancel">CANCEL</button>
+    </div>
+  </div>
+  <!-- Custom Camera Modal -->
+  <div id="customCameraModal" class="photo-modal" style="display:none;align-items:center;justify-content:center;">
+    <div class="photo-modal-content" style="max-width:340px;">
+      <div class="photo-modal-title">Take a Photo</div>
+      <video id="cameraVideo" autoplay playsinline style="width:100%;max-width:320px;border-radius:16px;"></video>
+      <button class="photo-modal-cancel" id="cameraCaptureBtn" style="margin:16px 0 0 0;background:#000000;">CAPTURE</button>
+      <button class="photo-modal-cancel" id="cameraCloseBtn" style="margin-top:8px;">CLOSE</button>
+    </div>
+  </div>
+  <!-- Hidden file inputs for camera and gallery -->
+  <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
+  <input type="file" id="galleryInput" accept="image/*" style="display:none;">
+  <!-- Preview for selected/taken image -->
+  <div id="photoPreviewModal" class="photo-modal" style="display:none;align-items:center;justify-content:center;">
+    <div class="photo-modal-content" style="max-width:340px;">
+      <div class="photo-modal-title">Preview</div>
+      <img id="photoPreviewImg" src="" alt="Preview" style="max-width:90%;max-height:260px;border-radius:16px;margin-bottom:18px;"/>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button class="photo-modal-cancel" id="photoPreviewCancel" style="background:#ccc;color:#222;">CANCEL</button>
+        <button class="photo-modal-cancel" id="photoPreviewProcess" style="background:#000000;">PROCESS</button>
+      </div>
+    </div>
+  </div>
+  <!-- Result Page -->
+  <div id="resultPage" class="mobile-container" style="display:none;">
+    <a href="#" class="home-btn" onclick="showPage('welcomePage'); return false;" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div class="assessment-header">
+      <button class="arrow-btn left-arrow" id="resultBackBtn">&#8592;</button>
+      <span class="assessment-title">Analysis Result</span>
+    </div>
+    <div style="margin-top:24px;position:relative;text-align:center;">
+      <div id="resultImgWrap" style="position:relative;"></div>
+    </div>
+    <div id="resultMoodText" style="font-size:1.3em;font-weight:500;margin:24px 0 0 0;"></div>
+    <!-- Chat UI for image result -->
+    <div id="resultChatWrap" style="width:100%;max-width:340px;margin:32px auto 0 auto;">
+      <div id="resultChat" style="background:#f7faff;border-radius:16px;padding:16px;min-height:120px;max-height:220px;overflow-y:auto;"></div>
+      <form id="resultChatForm" style="display:flex;gap:8px;margin-top:8px;">
+        <input id="resultChatInput" type="text" placeholder="Type your message..." style="flex:1;padding:10px 14px;border-radius:16px;border:1px solid #ccc;font-size:1em;" autocomplete="off" />
+        <button type="submit" style="background:#000000;color:#fff;border:none;border-radius:16px;padding:0 18px;font-size:1.2em;">➤</button>
+      </form>
+      <button id="resultChatCompleteBtn" style="margin:18px auto 0 auto;display:block;padding:12px 32px;font-size:1.1em;background:#000000;color:#fff;border:none;border-radius:18px;">Complete</button>
+    </div>
+    <button id="resultContinueBtn" style="margin:32px 0 0 0;padding:16px 36px;font-size:1.2em;background:#000;color:#fff;border:none;border-radius:24px;">Continue</button>
+  </div>
+  <!-- Live Interaction Page -->
+  <div id="livePage" class="mobile-container" style="display:none;">
+    <a href="#" class="home-btn" onclick="showPage('welcomePage'); return false;" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div class="assessment-header">
+      <button class="arrow-btn left-arrow" id="liveBackBtn">&#8592;</button>
+      <span class="assessment-title">Live Interaction</span>
+    </div>
+    <div class="live-content">
+      <div id="liveVideoWrap" class="live-video-container">
+        <video id="liveVideo" autoplay playsinline muted></video>
+        <canvas id="liveCanvas"></canvas>
+        <div class="live-overlay">
+          <div class="live-status">
+            <div class="live-indicator"></div>
+            <span>LIVE</span>
+    </div>
+          <div id="liveMoodText" class="live-mood-text"></div>
+        </div>
+      </div>
+      <div class="live-chat-container">
+        <div id="liveChat" class="live-chat-messages"></div>
+        <form id="liveChatForm" class="live-chat-input">
+          <input id="liveChatInput" type="text" placeholder="Type your message..." autocomplete="off">
+          <button type="submit">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+            </svg>
+          </button>
+      </form>
+    </div>
+    </div>
+    <button id="liveContinueBtn" class="live-continue-btn">Continue</button>
+  </div>
+  <!-- Congrats Page -->
+  <div id="congratsPage" class="mobile-container" style="display:none;">
+    <a href="#" class="home-btn" onclick="showPage('welcomePage'); return false;" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div class="assessment-header">
+      <button class="arrow-btn left-arrow" id="congratsBackBtn">&#8592;</button>
+      <span class="assessment-title">Congratulations</span>
+    </div>
+    <div style="width: 100%; max-width: 420px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; padding: 24px 18px 80px 18px; box-sizing: border-box; align-items: center; text-align: center;">
+      <h1 style="margin-top:40px;font-size:2em;font-weight:700;">Congrats!</h1>
+      <div style="margin:20px 0 0 0;font-size:1em;line-height:1.5;">
+      You've completed your personalized setup!<br>
+      Now let's check how you're feeling today and customize your journey with Addy. ✨
+    </div>
+      <div style="margin:40px 0 32px 0;position:relative;width:110px;height:110px;">
+        <div style="position:absolute;left:-18px;top:-18px;width:90px;height:90px;background:#000;border-radius:50%;z-index:0;"></div>
+        <div style="position:absolute;right:-18px;bottom:-18px;width:90px;height:90px;background:#000;border-radius:50%;z-index:0;"></div>
+      <div style="width:110px;height:110px;background:#eaf4ff;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:1;position:relative;">
+          <span style="font-size:3em;">👍</span>
+      </div>
+    </div>
+      <button id="congratsDoneBtn" style="margin-top:16px;padding:14px 32px;font-size:1.1em;background:#000;color:#fff;border:none;border-radius:20px;">✓</button>
+    </div>
+  </div>
+  <!-- Daily Report Page -->
+  <div id="reportPage" class="mobile-container" style="display:none;flex-direction:column;min-height:100vh;">
+    <a href="#" class="home-btn" onclick="showPage('welcomePage'); return false;" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div class="assessment-header">
+      <button class="arrow-btn left-arrow" id="reportBackBtn">&#8592;</button>
+      <span class="assessment-title">Daily Report</span>
+    </div>
+    <div id="reportScroll" style="flex:1;overflow-y:auto;margin:0 auto;max-width:340px;text-align:left;padding-bottom:90px;">
+      <div style="margin-bottom:28px;">
+        <div style="font-size:2em;margin-bottom:8px;">📝</div>
+        <div style="font-size:1.45em;font-weight:800;color:#20506a;line-height:1.15;margin-bottom:2px;">
+          Your Daily Report<br>With Addy!
+        </div>
+      </div>
+      <!-- Mood Detection -->
+      <div style="margin-bottom:28px;">
+        <div style="font-weight:700;font-size:1.08em;margin-bottom:2px;">
+          <span style="color:#e57373;font-size:1.1em;">❤️‍🩹 Mood Detection:</span>
+        </div>
+        <div style="margin-left:2px;">
+          You are currently feeling <span id="reportMood" style="font-weight:600;">[Detected Emotion]</span>.<br>
+          <span style="color:#888;">We have tailored today's activities to match your emotional needs.</span>
+        </div>
+      </div>
+      <!-- Today's Goal -->
+      <div style="margin-bottom:28px;">
+        <div style="font-weight:700;font-size:1.08em;margin-bottom:2px;">
+          <span style="color:#ffb300;font-size:1.1em;">🎯 Today's Goal:</span>
+        </div>
+        <div style="margin-left:2px;">
+          Your goal today is: <span id="reportGoal" style="font-weight:600;">[User's Goal]</span><br>
+          <span style="color:#888;">Stay focused! Addy will help you break it into small steps.</span>
+        </div>
+      </div>
+      <!-- Medication Status -->
+      <div style="margin-bottom:28px;">
+        <div style="font-weight:700;font-size:1.08em;margin-bottom:2px;">
+          <span style="color:#ff9800;font-size:1.1em;">💊 Medication Status:</span>
+        </div>
+        <div style="margin-left:2px;">
+          <span id="reportMedication" style="font-weight:600;">[Yes/No]</span> – Medication reported.<br>
+          <span style="color:#888;">Remember: consistency in health routines matters!</span>
+        </div>
+      </div>
+      <!-- Chatbot Reflection -->
+      <div style="margin-bottom:28px;">
+        <div style="font-weight:700;font-size:1.08em;margin-bottom:2px;">
+          <span style="color:#607d8b;font-size:1.1em;">🤖 Chatbot Reflection:</span>
+        </div>
+        <div style="margin-left:2px;">
+          <span id="reportChatbot" style="font-weight:600;">[Chatbot summary]</span>
+        </div>
+      </div>
+      <!-- Encouragement -->
+      <div style="margin-bottom:12px;">
+        <div style="font-weight:700;font-size:1.08em;margin-bottom:2px;">
+          <span style="color:#90caf9;font-size:1.1em;">💡 Remember:</span>
+        </div>
+        <div style="margin-left:2px;">
+          Addy is here to support you —<br>
+          <span style="color:#888;">one step at a time!<br>You're doing amazing. <span style="font-size:1.1em;">✨</span></span>
+        </div>
+      </div>
+    <div style="margin:40px 0 0 0;display:flex;gap:18px;justify-content:center;">
+        <button id="editAssessmentBtn" style="background:#000;color:#fff;border:none;border-radius:12px;padding:14px 18px;font-size:1.3em;cursor:pointer;">
+        <span style="font-size:1.2em;">✉️</span>
+      </button>
+        <button id="editChatBtn" style="background:#000;color:#fff;border:none;border-radius:12px;padding:14px 18px;font-size:1.3em;cursor:pointer;">
+        <span style="font-size:1.2em;">✏️</span>
+      </button>
+    </div>
+    <button id="reportContinueBtn" style="margin:32px auto 0 auto;display:block;padding:16px 36px;font-size:1.2em;background:#000000;color:#fff;border:none;border-radius:24px;">Continue</button>
+    </div>
+  </div>
+  <!-- Dashboard Page -->
+  <div id="dashboardPage" class="mobile-container dashboard-scrollable" style="display:none;background:#f8f9fa;flex-direction:column;min-height:100vh;overflow-y:auto;position:relative;">
+    <a href="#" class="home-btn" onclick="showPage('welcomePage'); return false;" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div class="assessment-header" style="background:#fff;box-shadow:0 2px 12px rgba(0,0,0,0.05);">
+      <button class="arrow-btn left-arrow" id="dashboardBackBtn">&#8592;</button>
+      <span class="assessment-title" style="font-size:1.3em;font-weight:700;">Welcome to Addy!</span>
+      </div>
+    <div style="padding:24px 0 0 0;width:100%;text-align:center;">
+      <div class="dashboard-filters" style="display:flex;gap:10px;justify-content:center;margin-bottom:24px;padding:0 16px;">
+        <button class="dashboard-filter-btn active" style="background:#111;color:#fff;border:none;border-radius:18px;padding:8px 20px;font-size:0.95em;font-weight:600;transition:all 0.2s;">All</button>
+        <button class="dashboard-filter-btn" style="background:#fff;color:#000000;border:1.5px solid #000000;border-radius:18px;padding:8px 20px;font-size:0.95em;font-weight:600;transition:all 0.2s;">Tutor Chat</button>
+        <button class="dashboard-filter-btn" style="background:#fff;color:#000000;border:1.5px solid #000000;border-radius:18px;padding:8px 20px;font-size:0.95em;font-weight:600;transition:all 0.2s;">To-do-List</button>
+        <button class="dashboard-filter-btn" style="background:#fff;color:#000000;border:1.5px solid #000000;border-radius:18px;padding:8px 20px;font-size:0.95em;font-weight:600;transition:all 0.2s;">Mood</button>
+    </div>
+        </div>
+    <div style="width:100%;max-width:420px;margin:0 auto;">
+      <div class="dashboard-section">
+        <div class="dashboard-section-title">Tutor Chat</div>
+        <div class="dashboard-card-grid">
+          <a href="write-article.html" class="dashboard-card">
+            <div class="dashboard-card-icon">📝</div>
+            <div class="dashboard-card-title">Write an Article</div>
+            <div class="dashboard-card-desc">Generate well-written articles on any topic.</div>
+          </a>
+          <a href="summarize.html" class="dashboard-card">
+            <div class="dashboard-card-icon">📄</div>
+            <div class="dashboard-card-title">Summarize (TL;DR)</div>
+            <div class="dashboard-card-desc">Extract key points from long texts.</div>
+          </a>
+          <a href="pdf-summarizer.html" class="dashboard-card">
+            <div class="dashboard-card-icon">📑</div>
+            <div class="dashboard-card-title">PDF Summarizer</div>
+            <div class="dashboard-card-desc">Summarize the content of PDF files instantly.</div>
+          </a>
+        </div>
+      </div>
+      <div class="dashboard-section">
+        <div class="dashboard-section-title">To-Do-List & Voice Assistant</div>
+        <div class="dashboard-card-grid">
+          <a href="make-list.html" class="dashboard-card">
+            <div class="dashboard-card-icon">🗒️</div>
+            <div class="dashboard-card-title">Make a List</div>
+            <div class="dashboard-card-desc">Organize your tasks and goals.</div>
+          </a>
+          <a href="voice-assistant.html" class="dashboard-card">
+            <div class="dashboard-card-icon">🎤</div>
+            <div class="dashboard-card-title">Voice Assistant</div>
+            <div class="dashboard-card-desc">Talk to Addy hands-free.</div>
+          </a>
+        </div>
+        </div>
+      <div class="dashboard-section">
+        <div class="dashboard-section-title">Mood & Report</div>
+        <div class="dashboard-card-grid">
+          <a href="detect-mood.html" class="dashboard-card">
+            <div class="dashboard-card-icon">✉️</div>
+            <div class="dashboard-card-title">Detect Mood</div>
+            <div class="dashboard-card-desc">Track your emotional well-being.</div>
+          </a>
+          <a href="report.html" class="dashboard-card">
+            <div class="dashboard-card-icon">📰</div>
+            <div class="dashboard-card-title">Report</div>
+            <div class="dashboard-card-desc">View your daily progress.</div>
+          </a>
+      </div>
+        </div>
+      <div class="dashboard-section">
+        <div class="dashboard-section-title">Productivity</div>
+        <div class="dashboard-card-grid">
+          <a href="alarm.html" class="dashboard-card">
+            <div class="dashboard-card-icon">⏰</div>
+            <div class="dashboard-card-title">Set Alarm</div>
+            <div class="dashboard-card-desc">Set an alarm for your task and get notified!</div>
+          </a>
+        </div>
+      </div>
+      <div class="dashboard-section">
+        <div class="dashboard-section-title">Others</div>
+        <div class="dashboard-card-grid">
+          <a href="create-conversation.html" class="dashboard-card">
+            <div class="dashboard-card-icon">💬</div>
+            <div class="dashboard-card-title">Create Conversation</div>
+            <div class="dashboard-card-desc">Practice social interactions.</div>
+          </a>
+          <a href="tell-a-joke.html" class="dashboard-card">
+            <div class="dashboard-card-icon">😂</div>
+            <div class="dashboard-card-title">Tell a Joke</div>
+            <div class="dashboard-card-desc">Lighten up your day.</div>
+          </a>
+        </div>
+      </div>
+        </div>
+    <style>
+      .dashboard-section {
+        margin-bottom: 32px;
+      }
+      .dashboard-section-title {
+        font-size: 1.15em;
+        font-weight: 700;
+        margin: 24px 0 12px 0;
+        color: #111;
+        border-bottom: 1.5px solid #eee;
+        padding-bottom: 6px;
+        letter-spacing: 0.01em;
+      }
+      .dashboard-card-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        padding: 0 8px;
+      }
+      .dashboard-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 2px 12px #0001;
+        padding: 22px 12px 16px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: box-shadow 0.2s, transform 0.2s;
+        border: 1.5px solid #f2f2f2;
+      }
+      .dashboard-card:hover {
+        box-shadow: 0 6px 24px #0002;
+        transform: translateY(-2px) scale(1.03);
+      }
+      .dashboard-card-icon {
+        font-size: 2.1em;
+        margin-bottom: 10px;
+        background: #f7f7f7;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .dashboard-card-title {
+        font-weight: 700;
+        font-size: 1.08em;
+        color: #111;
+        margin-bottom: 4px;
+        text-align: center;
+      }
+      .dashboard-card-desc {
+        font-size: 0.93em;
+        color: #666;
+        text-align: center;
+        line-height: 1.4;
+      }
+    </style>
+    <button id="dashboardContinueBtn" class="primary-btn" style="margin:32px 0 24px 0;background:linear-gradient(45deg,#000000,#64b5f6);border:none;color:#fff;padding:16px 36px;font-size:1.2em;border-radius:24px;font-weight:600;box-shadow:0 4px 20px rgba(41,121,255,0.2);transition:transform 0.2s,box-shadow 0.2s;">Continue</button>
+    <div style="height:32px;"></div>
+  </div>
+  <style>
+    .photo-modal {
+      position: fixed; left: 0; right: 0; bottom: 0; top: 0;
+      background: rgba(0,0,0,0.18); z-index: 1000; display: flex; align-items: flex-end; justify-content: center;
+    }
+    .photo-modal-content {
+      background: #fff; border-radius: 24px 24px 0 0; width: 100%; max-width: 420px; padding: 32px 0 16px 0; box-shadow: 0 -2px 16px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .photo-modal-title { font-size: 1.3em; font-weight: 500; margin-bottom: 18px; color: #666; }
+    .photo-modal-options { display: flex; justify-content: space-around; margin-bottom: 18px; }
+    .photo-modal-btn { background: none; border: none; font-size: 1em; color: #222; outline: none; cursor: pointer; }
+    .photo-modal-icon { font-size: 2em; }
+    .photo-modal-cancel {
+      background: #000000; color: #fff; border: none; border-radius: 24px; padding: 12px 0; width: 90%; font-size: 1.1em; font-weight: 500; margin: 0 auto; display: block; cursor: pointer;
+    }
+    @media (max-width: 500px) {
+      .photo-modal-content { max-width: 100vw; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  <script>
+    // Assessment steps - Only Goal and Emotion Analysis
+    const steps = [
+      {
+        type: 'goal',
+        question: "What's your Goal for today?",
+        options: [
+          {icon: '🤍', text: 'I wanna reduce stress', value: 'reduce-stress'},
+          {icon: '👁️‍🗨️', text: 'I wanna try AI Therapy', value: 'ai-therapy'},
+          {icon: '🚩', text: 'I want to cope with trauma', value: 'cope-trauma'},
+          {icon: '😊', text: 'I want to be a better person', value: 'better-person'},
+          {icon: '🦉', text: 'Just trying out the app, mate!', value: 'just-trying'}
+        ]
+      },
+      {
+        type: 'emotion',
+        question: "Emotion Analysis",
+        description: "Now we'll scan your Face for better assessment. Please ensure the following:",
+        checklist: [
+          "Brightly lit room and environment",
+          "Hi-resolution camera capture",
+          "Clear body pose & anatomy"
+        ],
+        image: "emotion-analysis.svg"
+      }
+    ];
+    let currentStep = 0;
+    let answers = {};
+    let lastDetectedMood = null;
+
+    function renderStep() {
+      const container = document.getElementById('assessmentStep');
+      container.innerHTML = '';
+      if (steps[currentStep].type === 'goal') {
+        container.innerHTML = `
+          <h2 class="assessment-question">${steps[0].question}</h2>
+          <form class="assessment-options" id="assessmentForm">
+            ${steps[0].options.map((opt, i) => `
+              <label class="assessment-option${answers.goal === opt.value || (!answers.goal && i === 1) ? ' selected' : ''}">
+                <span class="option-icon">${opt.icon}</span>
+                <span class="option-text">${opt.text}</span>
+                <input type="radio" name="goal" value="${opt.value}"${answers.goal === opt.value || (!answers.goal && i === 1) ? ' checked' : ''}>
+                <span class="custom-radio"></span>
+              </label>
+            `).join('')}
+          </form>
+        `;
+        // Option selection logic
+        const form = container.querySelector('#assessmentForm');
+        if (form) {
+          form.addEventListener('click', function(e) {
+            let label = e.target.closest('.assessment-option');
+            if (!label) return;
+            // Remove selected from all, add to clicked
+            form.querySelectorAll('.assessment-option').forEach(opt => opt.classList.remove('selected'));
+            label.classList.add('selected');
+            // Set the radio
+            const radio = label.querySelector('input[type=radio]');
+            radio.checked = true;
+            answers.goal = radio.value;
+            // Go to emotion analysis step
+            setTimeout(() => {
+              currentStep = 1;
+              renderStep();
+            }, 80);
+          });
+        }
+      } else if (steps[currentStep].type === 'emotion') {
+        container.innerHTML = `
+          <h2 class="assessment-question emotion-title">${steps[currentStep].question}</h2>
+          <div class="emotion-desc">${steps[currentStep].description}</div>
+          <div class="emotion-img-wrap">
+            <img src="${steps[currentStep].image}" alt="Emotion Analysis" class="emotion-img"/>
+          </div>
+          <ul class="emotion-checklist">
+            ${steps[currentStep].checklist.map(item => `
+              <li><span class="emotion-check">&#10003;</span> ${item}</li>
+            `).join('')}
+          </ul>
+        `;
+        // Always show the continue button
+        const continueBtn = document.getElementById('continueBtn');
+        if (continueBtn) continueBtn.style.display = '';
+      }
+      // Back button
+      document.getElementById('backBtn').onclick = () => {
+        if (currentStep > 0) {
+          currentStep--;
+          renderStep();
+        } else {
+          window.history.back();
+        }
+      };
+      // Show or hide the Continue button depending on the step
+      const continueBtn = document.getElementById('continueBtn');
+      if (steps[currentStep].type === 'goal') {
+        continueBtn.style.display = 'none';
+      } else {
+        continueBtn.style.display = '';
+      }
+    }
+
+    document.getElementById('continueBtn').onclick = function() {
+      this.classList.add('clicked');
+      setTimeout(() => this.classList.remove('clicked'), 300);
+      // Validation
+      if (steps[currentStep].type === 'goal' && !answers.goal) {
+        alert('Please select a goal.');
+        return;
+      }
+      // Show photo modal after emotion step
+      if (steps[currentStep].type === 'emotion') {
+        document.getElementById('photoModal').style.display = 'flex';
+        return;
+      }
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        renderStep();
+      } else {
+        // After emotion analysis, go to dashboard
+        showDashboardPage();
+      }
+    };
+
+    // Photo modal logic
+    document.getElementById('cameraBtn').onclick = function() {
+      document.getElementById('photoModal').style.display = 'none';
+      // Try to use getUserMedia for a custom camera experience
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        const video = document.getElementById('cameraVideo');
+        document.getElementById('customCameraModal').style.display = 'flex';
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then(function(stream) {
+            video.srcObject = stream;
+            video._stream = stream;
+          })
+          .catch(function(err) {
+            alert('Camera access denied or not available.');
+            document.getElementById('customCameraModal').style.display = 'none';
+            document.getElementById('cameraInput').click(); // fallback
+          });
+      } else {
+        document.getElementById('cameraInput').click(); // fallback
+      }
+    };
+    document.getElementById('galleryBtn').onclick = function() {
+      document.getElementById('photoModal').style.display = 'none';
+      document.getElementById('galleryInput').click();
+    };
+    document.getElementById('photoModalCancel').onclick = function() {
+      document.getElementById('photoModal').style.display = 'none';
+    };
+
+    // Custom camera modal logic
+    document.getElementById('cameraCloseBtn').onclick = function() {
+      const video = document.getElementById('cameraVideo');
+      if (video._stream) {
+        video._stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        video._stream = null;
+      }
+      document.getElementById('customCameraModal').style.display = 'none';
+    };
+    document.getElementById('cameraCaptureBtn').onclick = function() {
+      const video = document.getElementById('cameraVideo');
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/png');
+      document.getElementById('photoPreviewImg').src = dataUrl;
+      document.getElementById('photoPreviewModal').style.display = 'flex';
+      // Stop camera
+      if (video._stream) {
+        video._stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        video._stream = null;
+      }
+      document.getElementById('customCameraModal').style.display = 'none';
+      // Analyze the captured image
+      const img = document.getElementById('photoPreviewImg');
+      img.onload = function() {
+        analyzePhoto(img);
+      };
+    };
+
+    // Load face-api.js models on page load
+    Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
+      faceapi.nets.faceExpressionNet.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models')
+    ]).then(() => {
+      console.log('face-api.js models loaded');
+    });
+
+    // Helper: get emoji for expression
+    function getExpressionEmoji(expression) {
+      switch(expression) {
+        case 'happy': return '😄';
+        case 'sad': return '😢';
+        case 'angry': return '😠';
+        case 'surprised': return '😲';
+        case 'fearful': return '😨';
+        case 'disgusted': return '🤢';
+        case 'neutral': return '😐';
+        default: return '🙂';
+      }
+    }
+
+    // Analyze photo with face-api.js
+    async function analyzePhoto(imgEl) {
+      // Remove previous canvas if any
+      const prevCanvas = document.getElementById('faceapi-canvas');
+      if (prevCanvas) prevCanvas.remove();
+      // Detect face and expressions
+      const detections = await faceapi.detectSingleFace(imgEl, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions();
+      if (!detections) {
+        let moodText = '<span style="color:#f44">No face detected</span>';
+        document.getElementById('photoPreviewMood').innerHTML = moodText;
+        return;
+      }
+      
+      // Get expressions
+      const expressions = detections.expressions;
+      let maxExp = '';
+      let maxVal = 0;
+      for (const [emotion, value] of Object.entries(expressions)) {
+        if (value > maxVal) {
+          maxVal = value;
+          maxExp = emotion;
+        }
+      }
+      
+      // Draw box and label
+      const canvas = document.createElement('canvas');
+      canvas.id = 'faceapi-canvas';
+      canvas.width = imgEl.width;
+      canvas.height = imgEl.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(imgEl, 0, 0);
+      
+      const box = detections.detection.box;
+      ctx.strokeStyle = '#00ff00';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(box.x, box.y, box.width, box.height);
+      
+      ctx.fillStyle = '#00ff00';
+      ctx.font = '16px Arial';
+      ctx.fillText(`${maxExp} (${(maxVal * 100).toFixed(0)}%)`, box.x, box.y - 5);
+      
+      const previewContainer = document.getElementById('photoPreviewImg').parentElement;
+      previewContainer.appendChild(canvas);
+      canvas.style.position = 'absolute';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      
+      let moodText = `Detected mood: <b>${maxExp}</b> ${getExpressionEmoji(maxExp)}`;
+      lastDetectedMood = maxExp;
+      document.getElementById('photoPreviewMood').innerHTML = moodText;
+    }
+
+    // Gallery input handler
+    document.getElementById('galleryInput').onchange = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+        const reader = new FileReader();
+      reader.onload = function(event) {
+          const img = document.getElementById('photoPreviewImg');
+        img.src = event.target.result;
+          document.getElementById('photoPreviewModal').style.display = 'flex';
+          img.onload = function() {
+            analyzePhoto(img);
+          };
+        };
+      reader.readAsDataURL(file);
+    };
+
+    // Camera input handler (fallback)
+    document.getElementById('cameraInput').onchange = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = document.getElementById('photoPreviewImg');
+        img.src = event.target.result;
+        document.getElementById('photoPreviewModal').style.display = 'flex';
+        img.onload = function() {
+          analyzePhoto(img);
+        };
+      };
+      reader.readAsDataURL(file);
+    };
+
+    // Photo preview modal handlers
+    document.getElementById('photoPreviewProcess').onclick = async function() {
+      const img = document.getElementById('photoPreviewImg');
+      if (img.src) {
+        // Analyze the photo first
+        await analyzePhoto(img);
+        // Show result page
+        document.getElementById('photoPreviewModal').style.display = 'none';
+        document.getElementById('assessmentPage').style.display = 'none';
+        document.getElementById('resultPage').style.display = 'flex';
+        
+        // Clone the image with canvas overlay to result page
+      const wrap = document.getElementById('resultImgWrap');
+      wrap.innerHTML = '';
+      const resultImg = img.cloneNode();
+      resultImg.id = 'photoResultImg';
+      resultImg.style.maxWidth = '90vw';
+      resultImg.style.maxHeight = '340px';
+      resultImg.style.borderRadius = '16px';
+        
+        // Wait for image to load, then add canvas overlay
+      resultImg.onload = async function() {
+        const prevCanvas = document.getElementById('faceapi-result-canvas');
+        if (prevCanvas) prevCanvas.remove();
+        const detections = await faceapi.detectSingleFace(resultImg, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions();
+        if (detections) {
+          const canvas = faceapi.createCanvasFromMedia(resultImg);
+          canvas.id = 'faceapi-result-canvas';
+          canvas.style.position = 'absolute';
+          canvas.style.left = resultImg.offsetLeft + 'px';
+          canvas.style.top = resultImg.offsetTop + 'px';
+          canvas.style.maxWidth = resultImg.style.maxWidth;
+          canvas.style.maxHeight = resultImg.style.maxHeight;
+          canvas.style.zIndex = 2;
+          resultImg.style.zIndex = 1;
+          wrap.appendChild(canvas);
+          faceapi.matchDimensions(canvas, { width: resultImg.width, height: resultImg.height });
+          const dims = { width: resultImg.width, height: resultImg.height };
+          const resized = faceapi.resizeResults(detections, dims);
+          faceapi.draw.drawDetections(canvas, resized);
+            faceapi.draw.drawFaceExpressions(canvas, resized);
+          }
+      };
+      wrap.appendChild(resultImg);
+      attachContinueListeners();
+        // Show bot message responding to detected mood
+        const chatEl = document.getElementById('resultChat');
+        if (chatEl) {
+          const msg = getAddyMoodMessage(lastDetectedMood);
+          chatEl.innerHTML = '<div style="margin:0 0 10px 0;text-align:left;"><span style="display:inline-block;padding:10px 14px;border-radius:16px;max-width:85%;background:#eaf4ff;color:#222;">' + msg + '</span></div>';
+          chatEl.scrollTop = chatEl.scrollHeight;
+        }
+      }
+    };
+    
+    // Cancel button: revert to Emotion Analysis step
+    document.getElementById('photoPreviewCancel').onclick = function() {
+      document.getElementById('photoPreviewModal').style.display = 'none';
+      // Remove faceapi canvas if present
+      const prevCanvas = document.getElementById('faceapi-canvas');
+      if (prevCanvas) prevCanvas.remove();
+      // Return to Emotion Analysis step
+      currentStep = steps.findIndex(s => s.type === 'emotion');
+      renderStep();
+    };
+
+    // Attach result/congrats page button listeners
+    function attachContinueListeners() {
+      const resultContinueBtn = document.getElementById('resultContinueBtn');
+      if (resultContinueBtn) {
+        resultContinueBtn.onclick = function() {
+      document.getElementById('resultPage').style.display = 'none';
+          document.getElementById('congratsPage').style.display = 'flex';
+        };
+      }
+      const congratsDoneBtn = document.getElementById('congratsDoneBtn');
+      if (congratsDoneBtn) {
+        congratsDoneBtn.onclick = function() {
+          showDashboardPage();
+        };
+      }
+      const resultChatCompleteBtn = document.getElementById('resultChatCompleteBtn');
+      if (resultChatCompleteBtn) {
+        resultChatCompleteBtn.onclick = function() {
+          document.getElementById('resultPage').style.display = 'none';
+          document.getElementById('congratsPage').style.display = 'flex';
+        };
+      }
+      // Prevent form redirect: handle result chat as chatbot with Gemini (mood-aware)
+      const resultChatForm = document.getElementById('resultChatForm');
+      const resultChatInput = document.getElementById('resultChatInput');
+      if (resultChatForm && resultChatInput) {
+        resultChatForm.onsubmit = function(e) {
+          e.preventDefault();
+          var msg = resultChatInput.value.trim();
+          if (!msg) return false;
+          var chatEl = document.getElementById('resultChat');
+          if (!chatEl) return false;
+          chatEl.innerHTML += '<div style="margin:10px 0 0 0;text-align:right;"><span style="display:inline-block;padding:10px 14px;border-radius:16px;max-width:85%;background:#000;color:#fff;">' + escapeHtml(msg) + '</span></div>';
+          var thinkingId = 'result-thinking-' + Date.now();
+          chatEl.innerHTML += '<div id="' + thinkingId + '" style="margin:10px 0 0 0;text-align:left;"><span style="display:inline-block;padding:10px 14px;border-radius:16px;max-width:85%;background:#eaf4ff;color:#666;">Addy is thinking...</span></div>';
+          chatEl.scrollTop = chatEl.scrollHeight;
+          resultChatInput.value = '';
+          (async function() {
+            var reply = await fetchGeminiChat(lastDetectedMood, msg);
+            var thinkingDiv = document.getElementById(thinkingId);
+            if (thinkingDiv) thinkingDiv.innerHTML = '<span style="display:inline-block;padding:10px 14px;border-radius:16px;max-width:85%;background:#eaf4ff;color:#222;">' + escapeHtml(reply) + '</span>';
+            if (chatEl) chatEl.scrollTop = chatEl.scrollHeight;
+          })();
+          return false;
+        };
+      }
+    }
+
+    // Gemini API for result chat (mood-aware responses)
+    const GEMINI_API_KEY = "AIzaSyBHVcKl7l5qJxcXx2oin1_eHv2Ds2Ub7P4";
+    const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+
+    async function fetchGeminiChat(mood, userMessage) {
+      const prompt = "You are Addy, a warm and empathetic emotional support assistant. The user's current detected mood from our app is: " + (mood || 'neutral') + ". They just said: \"" + userMessage.replace(/"/g, '\\"') + "\". Reply in 1-3 short, supportive sentences that acknowledge their mood and respond directly to what they said. Be conversational and kind.";
+      try {
+        const res = await fetch(GEMINI_API_URL + "?key=" + GEMINI_API_KEY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+        if (!res.ok) throw new Error('API ' + res.status);
+      const data = await res.json();
+        if (data.error) throw new Error(data.error.message || 'API error');
+        return data?.candidates?.[0]?.content?.parts?.[0]?.text || "I'm here for you. How can I help more?";
+      } catch (err) {
+        console.warn('Gemini chat error:', err);
+        return "I'm here for you. Something went wrong on my side—try again in a moment.";
+      }
+    }
+
+    function escapeHtml(text) {
+      var div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Bot message based on detected mood
+    function getAddyMoodMessage(mood) {
+      const m = (mood || '').toLowerCase();
+      switch (m) {
+        case 'happy': return "You look happy! Want to share what's making your day great?";
+        case 'sad': return "I noticed you seem sad. I'm here to listen if you want to talk.";
+        case 'angry': return "It looks like you're feeling angry. Would you like to talk about it?";
+        case 'surprised': return "You seem surprised! Want to tell me what happened?";
+        case 'fearful': return "You look a bit worried. I'm here for you if you want to share.";
+        case 'disgusted': return "I noticed some discomfort. Want to talk about it?";
+        case 'neutral': return "I see you're feeling neutral. How can I support you today?";
+        default: return "Hi! I'm Addy. How are you feeling right now?";
+      }
+    }
+
+    // Load face-api.js models on page load
+    Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
+      faceapi.nets.faceExpressionNet.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models')
+    ]).then(() => {
+      console.log('face-api.js models loaded');
+    });
+
+    // Helper: get emoji for expression
+    function getExpressionEmoji(expression) {
+      switch(expression) {
+        case 'happy': return '😄';
+        case 'sad': return '😢';
+        case 'angry': return '😠';
+        case 'surprised': return '😲';
+        case 'fearful': return '😨';
+        case 'disgusted': return '🤢';
+        case 'neutral': return '😐';
+        default: return '🙂';
+      }
+    }
+
+    // Analyze photo with face-api.js
+    async function analyzePhoto(imgEl) {
+      // Remove previous canvas if any
+      const prevCanvas = document.getElementById('faceapi-canvas');
+      if (prevCanvas) prevCanvas.remove();
+      // Detect face and expressions
+      const detections = await faceapi.detectSingleFace(imgEl, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions();
+      if (!detections) {
+        let moodText = '<span style="color:#f44">No face detected</span>';
+        lastDetectedMood = 'neutral';
+        const resultMoodEl = document.getElementById('resultMoodText');
+        if (resultMoodEl) resultMoodEl.innerHTML = moodText;
+        return;
+      }
+      
+      // Get expressions
+      const expressions = detections.expressions;
+      let maxExp = '';
+      let maxVal = 0;
+      for (const [emotion, value] of Object.entries(expressions)) {
+        if (value > maxVal) {
+          maxVal = value;
+          maxExp = emotion;
+        }
+      }
+      
+      // Draw box and label on preview
+      const canvas = faceapi.createCanvasFromMedia(imgEl);
+      canvas.id = 'faceapi-canvas';
+      canvas.style.position = 'absolute';
+      canvas.style.left = imgEl.offsetLeft + 'px';
+      canvas.style.top = imgEl.offsetTop + 'px';
+      canvas.style.maxWidth = imgEl.style.maxWidth;
+      canvas.style.maxHeight = imgEl.style.maxHeight;
+      imgEl.parentNode.appendChild(canvas);
+      faceapi.matchDimensions(canvas, { width: imgEl.width, height: imgEl.height });
+      const dims = { width: imgEl.width, height: imgEl.height };
+      const resized = faceapi.resizeResults(detections, dims);
+      faceapi.draw.drawDetections(canvas, resized);
+      faceapi.draw.drawFaceExpressions(canvas, resized);
+      
+      // Update mood text on result page
+      let moodText = `Detected mood: <b>${maxExp}</b> ${getExpressionEmoji(maxExp)}`;
+      lastDetectedMood = maxExp;
+      const resultMoodEl = document.getElementById('resultMoodText');
+      if (resultMoodEl) resultMoodEl.innerHTML = moodText;
+    }
+
+    function renderStep() {
+      const container = document.getElementById('assessmentStep');
+      container.innerHTML = '';
+      if (steps[currentStep].type === 'goal') {
+        container.innerHTML = `
+          <h2 class="assessment-question">${steps[0].question}</h2>
+          <form class="assessment-options" id="assessmentForm">
+            ${steps[0].options.map((opt, i) => `
+              <label class="assessment-option${answers.goal === opt.value || (!answers.goal && i === 1) ? ' selected' : ''}">
+                <span class="option-icon">${opt.icon}</span>
+                <span class="option-text">${opt.text}</span>
+                <input type="radio" name="goal" value="${opt.value}"${answers.goal === opt.value || (!answers.goal && i === 1) ? ' checked' : ''}>
+                <span class="custom-radio"></span>
+              </label>
+            `).join('')}
+          </form>
+        `;
+        // Option selection logic
+        const form = container.querySelector('#assessmentForm');
+        if (form) {
+          form.addEventListener('click', function(e) {
+            let label = e.target.closest('.assessment-option');
+            if (!label) return;
+            // Remove selected from all, add to clicked
+            form.querySelectorAll('.assessment-option').forEach(opt => opt.classList.remove('selected'));
+            label.classList.add('selected');
+            // Set the radio
+            const radio = label.querySelector('input[type=radio]');
+            radio.checked = true;
+            answers.goal = radio.value;
+            // Go to emotion analysis step
+            setTimeout(() => {
+              currentStep = 1;
+              renderStep();
+            }, 80);
+          });
+        }
+      } else if (steps[currentStep].type === 'emotion') {
+        container.innerHTML = `
+          <h2 class="assessment-question emotion-title">${steps[currentStep].question}</h2>
+          <div class="emotion-desc">${steps[currentStep].description}</div>
+          <div class="emotion-img-wrap">
+            <img src="${steps[currentStep].image}" alt="Emotion Analysis" class="emotion-img"/>
+          </div>
+          <ul class="emotion-checklist">
+            ${steps[currentStep].checklist.map(item => `
+              <li><span class="emotion-check">&#10003;</span> ${item}</li>
+            `).join('')}
+          </ul>
+        `;
+        // Always show the continue button
+        const continueBtn = document.getElementById('continueBtn');
+        if (continueBtn) continueBtn.style.display = '';
+      }
+      // Back button
+      document.getElementById('backBtn').onclick = () => {
+        if (currentStep > 0) {
+          currentStep--;
+          renderStep();
+        } else {
+          window.history.back();
+        }
+      };
+      // Show or hide the Continue button depending on the step
+      const continueBtn = document.getElementById('continueBtn');
+      if (steps[currentStep].type === 'goal') {
+        continueBtn.style.display = 'none';
+      } else {
+        continueBtn.style.display = '';
+      }
+    }
+
+    document.getElementById('continueBtn').onclick = function() {
+      this.classList.add('clicked');
+      setTimeout(() => this.classList.remove('clicked'), 300);
+      // Validation
+      if (steps[currentStep].type === 'goal' && !answers.goal) {
+        alert('Please select a goal.');
+        return;
+      }
+      // Show photo modal after emotion step
+      if (steps[currentStep].type === 'emotion') {
+        document.getElementById('photoModal').style.display = 'flex';
+        return;
+      }
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        renderStep();
+      } else {
+        // After emotion analysis, go to dashboard
+        showDashboardPage();
+      }
+    };
+
+    // Photo modal logic
+    document.getElementById('cameraBtn').onclick = function() {
+      document.getElementById('photoModal').style.display = 'none';
+      // Try to use getUserMedia for a custom camera experience
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        const video = document.getElementById('cameraVideo');
+        document.getElementById('customCameraModal').style.display = 'flex';
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then(function(stream) {
+            video.srcObject = stream;
+            video._stream = stream;
+          })
+          .catch(function(err) {
+            alert('Camera access denied or not available.');
+            document.getElementById('customCameraModal').style.display = 'none';
+            document.getElementById('cameraInput').click(); // fallback
+          });
+      } else {
+        document.getElementById('cameraInput').click(); // fallback
+      }
+    };
+    document.getElementById('galleryBtn').onclick = function() {
+      document.getElementById('photoModal').style.display = 'none';
+      document.getElementById('galleryInput').click();
+    };
+    document.getElementById('photoModalCancel').onclick = function() {
+      document.getElementById('photoModal').style.display = 'none';
+    };
+
+    // Custom camera modal logic
+    document.getElementById('cameraCloseBtn').onclick = function() {
+      const video = document.getElementById('cameraVideo');
+      if (video._stream) {
+        video._stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        video._stream = null;
+      }
+      document.getElementById('customCameraModal').style.display = 'none';
+    };
+    document.getElementById('cameraCaptureBtn').onclick = function() {
+      const video = document.getElementById('cameraVideo');
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/png');
+      document.getElementById('photoPreviewImg').src = dataUrl;
+      document.getElementById('photoPreviewModal').style.display = 'flex';
+      // Stop camera
+      if (video._stream) {
+        video._stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        video._stream = null;
+      }
+      document.getElementById('customCameraModal').style.display = 'none';
+      // Analyze the captured image
+      const img = document.getElementById('photoPreviewImg');
+      img.onload = function() {
+        analyzePhoto(img);
+      };
+    };
+
+    // Gallery input handler
+    document.getElementById('galleryInput').onchange = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = document.getElementById('photoPreviewImg');
+        img.src = event.target.result;
+        document.getElementById('photoPreviewModal').style.display = 'flex';
+        img.onload = function() {
+          analyzePhoto(img);
+        };
+      };
+      reader.readAsDataURL(file);
+    };
+
+    // Camera input handler (fallback)
+    document.getElementById('cameraInput').onchange = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = document.getElementById('photoPreviewImg');
+        img.src = event.target.result;
+        document.getElementById('photoPreviewModal').style.display = 'flex';
+        img.onload = function() {
+          analyzePhoto(img);
+        };
+      };
+      reader.readAsDataURL(file);
+    };
+
+
+    // Initialize renderStep on page load if on assessment page
+    if (document.getElementById('assessmentPage').style.display !== 'none') {
+      renderStep();
+    }
+
+    // Show Dashboard Page function
+    function showDashboardPage() {
+      showPage('dashboardPage');
+      window.history.pushState({ page: 'dashboard' }, '', '');
+      const dash = document.getElementById('dashboardPage');
+      // If dashboard is empty, fill it (idempotent)
+      if (!dash.innerHTML.trim()) {
+        dash.innerHTML = `
+          <div style="padding:0 0 0 0;width:100%;text-align:center;">
+            <div style="height:24px;"></div>
+            <h2 style="font-size:1.7em;font-weight:700;margin-bottom:10px;">Welcome to Addy!</h2>
+            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;">
+              <button style="background:#111;color:#fff;border:none;border-radius:18px;padding:7px 20px;font-size:1em;font-weight:600;">All</button>
+              <button style="background:#fff;color:#000000;border:1.5px solid #000000;border-radius:18px;padding:7px 20px;font-size:1em;font-weight:600;">Tutor Chat</button>
+              <button style="background:#fff;color:#000000;border:1.5px solid #000000;border-radius:18px;padding:7px 20px;font-size:1em;font-weight:600;">To-do-List</button>
+              <button style="background:#fff;color:#000000;border:1.5px solid #000000;border-radius:18px;padding:7px 20px;font-size:1em;font-weight:600;">Mood</button>
+            </div>
+          </div>
+          <div style="width:100%;max-width:420px;padding:0 18px;">
+            <div style="font-size:1.13em;font-weight:700;margin:18px 0 8px 0;">Tutor Chat</div>
+            <div style="display:flex;gap:14px;overflow-x:auto;margin-bottom:18px;">
+              <a href="write-article.html" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">📝</div>
+                  <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">Write an Article</div>
+                <div style="font-size:0.97em;color:#444;">Generate well-written articles on any topic you want.</div>
+              </div>
+              </a>
+              <a href="summarize.html" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">📄</div>
+                <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">Summarize<br>(TL;DR)</div>
+                <div style="font-size:0.97em;color:#444;">Extract key points from long texts.</div>
+              </div>
+              </a>
+              <a href="detect-mood.html" class="dashboard-card">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                  <div style="font-size:1.7em;">❤️‍🩹</div>
+                  <div class="dashboard-card-title">Detect Mood</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Continue to dashboard from report (show dashboard section, hide report)
+    function showDashboardPage() {
+      showPage('dashboardPage');
+      window.history.pushState({ page: 'dashboard' }, '', '');
+      const dash = document.getElementById('dashboardPage');
+      // If dashboard is empty, fill it (idempotent)
+      if (!dash.innerHTML.trim()) {
+        dash.innerHTML = `
+          <div style="padding:0 0 0 0;width:100%;text-align:center;">
+            <div style="height:24px;"></div>
+            <h2 style="font-size:1.7em;font-weight:700;margin-bottom:10px;">Welcome to Addy!</h2>
+            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;">
+              <button style="background:#111;color:#fff;border:none;border-radius:18px;padding:7px 20px;font-size:1em;font-weight:600;">All</button>
+              <button style="background:#fff;color:#000000;border:1.5px solid #000000;border-radius:18px;padding:7px 20px;font-size:1em;font-weight:600;">Tutor Chat</button>
+              <button style="background:#fff;color:#000000;border:1.5px solid #000000;border-radius:18px;padding:7px 20px;font-size:1em;font-weight:600;">To-do-List</button>
+              <button style="background:#fff;color:#000000;border:1.5px solid #000000;border-radius:18px;padding:7px 20px;font-size:1em;font-weight:600;">Mood</button>
+            </div>
+          </div>
+          <div style="width:100%;max-width:420px;padding:0 18px;">
+            <div style="font-size:1.13em;font-weight:700;margin:18px 0 8px 0;">Tutor Chat</div>
+            <div style="display:flex;gap:14px;overflow-x:auto;margin-bottom:18px;">
+              <a href="write-article.html" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">📝</div>
+                  <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">Write an Article</div>
+                <div style="font-size:0.97em;color:#444;">Generate well-written articles on any topic you want.</div>
+              </div>
+              </a>
+              <a href="summarize.html" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">📄</div>
+                <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">Summarize<br>(TL;DR)</div>
+                <div style="font-size:0.97em;color:#444;">Extract key points from long texts.</div>
+              </div>
+              </a>
+              <a href="pdf-summarizer.html" class="dashboard-card-link" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">📑</div>
+                <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">PDF Summarizer</div>
+                <div style="font-size:0.97em;color:#444;">Summarize the content of PDF files instantly.</div>
+              </div>
+              </a>
+            </div>
+            <div style="font-size:1.13em;font-weight:700;margin:18px 0 8px 0;">To-Do-List & Voice Assistant</div>
+            <div style="display:flex;gap:14px;overflow-x:auto;margin-bottom:18px;">
+              <a href="make-list.html" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">🗒️</div>
+                <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">Make a List</div>
+                  <div style="font-size:0.97em;color:#444;">Organize your tasks and goals.</div>
+              </div>
+              </a>
+              <a href="voice-assistant.html" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">🎤</div>
+                <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">Voice Assistant</div>
+                  <div style="font-size:0.97em;color:#444;">Talk to Addy hands-free.</div>
+              </div>
+              </a>
+            </div>
+            <div style="font-size:1.13em;font-weight:700;margin:18px 0 8px 0;">Mood & Report</div>
+            <div style="display:flex;gap:14px;overflow-x:auto;margin-bottom:18px;">
+              <a href="detect-mood.html" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">✉️</div>
+                <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">Detect Mood</div>
+                  <div style="font-size:0.97em;color:#444;">Track your emotional well-being.</div>
+              </div>
+              </a>
+              <a href="report.html" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">📰</div>
+                <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">Report</div>
+                  <div style="font-size:0.97em;color:#444;">View your daily progress.</div>
+              </div>
+              </a>
+            </div>
+            <div style="font-size:1.13em;font-weight:700;margin:18px 0 8px 0;">Productivity</div>
+            <div style="display:flex;gap:14px;overflow-x:auto;margin-bottom:18px;">
+              <a href="alarm.html" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">⏰</div>
+                <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">Set Alarm</div>
+                  <div style="font-size:0.97em;color:#444;">Set an alarm for your task and get notified!</div>
+              </div>
+              </a>
+            </div>
+            <div style="font-size:1.13em;font-weight:700;margin:18px 0 8px 0;">Others</div>
+            <div style="display:flex;gap:14px;overflow-x:auto;margin-bottom:18px;">
+              <a href="create-conversation.html" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">💬</div>
+                <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">Create Conversation</div>
+                  <div style="font-size:0.97em;color:#444;">Practice social interactions.</div>
+              </div>
+              </a>
+              <a href="tell-a-joke.html" style="text-decoration:none;">
+                <div style="background:#fafbfc;border-radius:18px;padding:16px 16px 12px 16px;min-width:150px;max-width:170px;box-shadow:0 1px 4px #0001;cursor:pointer;">
+                <div style="font-size:1.7em;">😂</div>
+                <div style="font-weight:700;margin:7px 0 2px 0;font-size:1.08em;">Tell a Joke</div>
+                  <div style="font-size:0.97em;color:#444;">Lighten up your day.</div>
+              </div>
+              </a>
+            </div>
+          </div>
+          <button id="dashboardContinueBtn" style="margin:32px 0 24px 0;padding:16px 36px;font-size:1.2em;background:#000;color:#fff;border:none;border-radius:24px;">Continue</button>
+          <div style="height:32px;"></div>
+          <div style="position:fixed;left:0;right:0;bottom:0;background:#fff;box-shadow:0 -2px 12px #0001;display:flex;justify-content:space-around;align-items:center;height:54px;max-width:430px;margin:0 auto;z-index:10;">
+            <div style="font-size:1.6em;color:#bbb;">💬<br><span style="font-size:0.7em;">Chat</span></div>
+            <div style="font-size:1.6em;color:#000;font-weight:700;">⬛<br><span style="font-size:0.7em;">Dashboard</span></div>
+            <div style="font-size:1.6em;color:#bbb;">📅<br><span style="font-size:0.7em;">Planner</span></div>
+            <div style="font-size:1.6em;color:#bbb;">👤<br><span style="font-size:0.7em;">Account</span></div>
+          </div>
+        `;
+      }
+    }
+
+    // Continue to dashboard from report (show dashboard section, hide report)
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('reportContinueBtn');
+      if (btn) {
+        btn.onclick = function() {
+          showDashboardPage();
+        };
+      }
+    });
+
+    // Enhanced back button functionality
+    function handleBackNavigation() {
+        const currentPage = getCurrentPage();
+        
+        switch(currentPage) {
+            case 'assessment':
+                if (currentStep > 0) {
+                    currentStep--;
+                    renderStep();
+                } else {
+                    window.history.back();
+                }
+                break;
+                
+            case 'live':
+                // Stop camera and cleanup
+                const video = document.getElementById('liveVideo');
+                if (video._cleanup) {
+                    video._cleanup();
+                }
+                document.getElementById('livePage').style.display = 'none';
+                showDashboardPage();
+                break;
+                
+            case 'result':
+                // Clean up result page and go to dashboard
+                document.getElementById('resultPage').style.display = 'none';
+                showDashboardPage();
+                break;
+                
+            case 'report':
+                // Go back to congrats page
+                document.getElementById('reportPage').style.display = 'none';
+                document.getElementById('congratsPage').style.display = 'flex';
+                break;
+                
+            case 'dashboard':
+                // Go back to report page
+                document.getElementById('dashboardPage').style.display = 'none';
+                document.getElementById('reportPage').style.display = 'flex';
+                break;
+                
+            default:
+                window.history.back();
+        }
+    }
+
+    // Helper function to determine current page
+    function getCurrentPage() {
+        if (document.getElementById('livePage').style.display !== 'none') return 'live';
+        if (document.getElementById('resultPage').style.display !== 'none') return 'result';
+        if (document.getElementById('reportPage').style.display !== 'none') return 'report';
+        if (document.getElementById('dashboardPage').style.display !== 'none') return 'dashboard';
+        if (document.getElementById('assessmentPage').style.display !== 'none') return 'assessment';
+        return 'unknown';
+    }
+
+    // Attach back button handlers to all back buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        const backButtons = [
+            'backBtn',
+            'liveBackBtn',
+            'resultBackBtn',
+            'reportBackBtn',
+            'dashboardBackBtn'
+        ];
+        
+        backButtons.forEach(btnId => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.onclick = handleBackNavigation;
+            }
+        });
+
+        // Handle hardware back button
+        window.onpopstate = function(event) {
+            handleBackNavigation();
+            // Prevent default back behavior
+            event.preventDefault();
+        };
+    });
+
+    // Add these new functions
+    function showPage(pageId) {
+        // Hide all main pages
+        const pages = [
+            'welcomePage',
+            'loginPage',
+            'signupPage',
+            'assessmentPage',
+            'livePage',
+            'resultPage',
+            'congratsPage',
+            'reportPage',
+            'dashboardPage'
+        ];
+        
+        pages.forEach(page => {
+            const element = document.getElementById(page);
+            if (element) element.style.display = 'none';
+        });
+        
+        // Show requested page
+        const pageToShow = document.getElementById(pageId);
+        if (pageToShow) {
+            pageToShow.style.display = 'flex';
+        }
+    }
+
+    function handleLogin(event) {
+        event.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        // Here you would typically validate and authenticate
+        // Proceed to assessment (Goal + Emotion Analysis)
+        localStorage.setItem('userEmail', email);
+        document.getElementById('assessmentPage').style.display = 'flex';
+        showPage('assessmentPage');
+        renderStep();
+    }
+
+    function handleSignup(event) {
+        event.preventDefault();
+        const name = document.getElementById('signupName').value;
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('signupConfirmPassword').value;
+        
+        if (password !== confirmPassword) {
+            alert('Passwords do not match!');
+            return;
+        }
+        
+        // Here you would typically create the account
+        // Proceed to assessment (Goal + Emotion Analysis)
+        localStorage.setItem('userName', name);
+        localStorage.setItem('userEmail', email);
+        document.getElementById('assessmentPage').style.display = 'flex';
+        showPage('assessmentPage');
+        renderStep();
+    }
+
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', function() {
+        // Start with welcome page
+        showPage('welcomePage');
+    });
+
+    // Edit buttons functionality
+    setTimeout(() => {
+      const editAssessmentBtn = document.getElementById('editAssessmentBtn');
+      if (editAssessmentBtn) {
+        editAssessmentBtn.onclick = function() {
+          // Redirect to dashboard instead
+          document.getElementById('reportPage').style.display = 'none';
+          showDashboardPage();
+        };
+      }
+      const editChatBtn = document.getElementById('editChatBtn');
+      if (editChatBtn) {
+        editChatBtn.onclick = function() {
+          // Go to chat page or open chat modal
+          window.location.href = 'chat.html';
+        };
+      }
+    }, 500);
+
+    // Replace edit button logic in script
+    function setupReportEditButtons() {
+      const editAssessmentBtn = document.getElementById('editAssessmentBtn');
+      if (editAssessmentBtn) {
+        editAssessmentBtn.onclick = function() {
+          // Redirect to dashboard instead
+          showDashboardPage();
+        };
+      }
+      const editChatBtn = document.getElementById('editChatBtn');
+      if (editChatBtn) {
+        editChatBtn.onclick = function() {
+          // Show modal to edit chatbot reflection
+          showEditModal('chatbot');
+        };
+      }
+    }
+    function showEditModal(type) {
+      const modal = document.getElementById('editModal');
+      const title = document.getElementById('editModalTitle');
+      const field = document.getElementById('editModalField');
+      modal.style.display = 'flex';
+      let value = '';
+      if (type === 'assessment') {
+        title.textContent = 'Edit Mood, Goal, or Medication';
+        // Build select for mood, input for goal, select for medication
+        const moods = (steps.find(s=>s.type==='mood')?.moods || []).map(m=>m.label);
+        const meds = (steps.find(s=>s.type==='medication')?.options || []).map(m=>m.label);
+        field.innerHTML = `
+          <label>Mood:<br><select id="editMood">${moods.map(m=>`<option${getCurrentMood()===m?' selected':''}>${m}</option>`)}</select></label><br><br>
+          <label>Goal:<br><input id="editGoal" value="${getCurrentGoal()}"></label><br><br>
+          <label>Medication:<br><select id="editMedication">${meds.map(m=>`<option${getCurrentMedication()===m?' selected':''}>${m}</option>`)}</select></label>
+        `;
+      } else if (type === 'chatbot') {
+        title.textContent = 'Edit Chatbot Reflection';
+        value = document.getElementById('reportChatbot').textContent;
+        field.innerHTML = `<textarea id="editChatbotReflection" style="width:90%;min-height:60px;border-radius:8px;border:1px solid #ccc;font-size:1.1em;">${value}</textarea>`;
+      }
+      document.getElementById('editModalSave').onclick = function() {
+        if (type === 'assessment') {
+          const newMood = document.getElementById('editMood').value;
+          const newGoal = document.getElementById('editGoal').value;
+          const newMed = document.getElementById('editMedication').value;
+          // Save to answers/localStorage
+          answers.mood = moods.indexOf(newMood);
+          answers.goal = newGoal;
+          answers.medication = meds.indexOf(newMed);
+          // Optionally update localStorage as well
+          document.getElementById('reportMood').textContent = newMood;
+          document.getElementById('reportGoal').textContent = newGoal;
+          document.getElementById('reportMedication').textContent = newMed;
+        } else if (type === 'chatbot') {
+          const newReflection = document.getElementById('editChatbotReflection').value;
+          answers.chatbotReflection = newReflection;
+          document.getElementById('reportChatbot').textContent = newReflection;
+        }
+        document.getElementById('editModal').style.display = 'none';
+      };
+      document.getElementById('editModalCancel').onclick = function() {
+        document.getElementById('editModal').style.display = 'none';
+      };
+    }
+    function getCurrentMood() {
+      if (answers.mood !== undefined) {
+        const moods = (steps.find(s=>s.type==='mood')?.moods || []);
+        return moods[answers.mood]?.label || '';
+      }
+      return '';
+    }
+    function getCurrentGoal() {
+      return answers.goal || '';
+    }
+    function getCurrentMedication() {
+      if (answers.medication !== undefined) {
+        const meds = (steps.find(s=>s.type==='medication')?.options || []);
+        return meds[answers.medication]?.label || '';
+      }
+      return '';
+    }
+
+    // Show Dashboard Page if hash is #dashboardPage on load
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.location.hash === '#dashboardPage') {
+        showDashboardPage();
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const moodSteps = document.querySelectorAll('.mood-step');
+      const moodZigzag = document.querySelector('.mood-zigzag');
+      
+      // Create zig-zag connectors
+      function createConnectors() {
+        const steps = Array.from(moodSteps);
+        steps.forEach((step, index) => {
+          if (index < steps.length - 1) {
+            const connector = document.createElement('div');
+            connector.className = 'mood-connector';
+            
+            // Calculate connector position and dimensions
+            const currentStep = step.getBoundingClientRect();
+            const nextStep = steps[index + 1].getBoundingClientRect();
+            
+            const top = currentStep.bottom - moodZigzag.getBoundingClientRect().top;
+            const height = nextStep.top - currentStep.bottom;
+            
+            connector.style.top = `${top}px`;
+            connector.style.height = `${height}px`;
+            connector.style.left = `${currentStep.left + currentStep.width/2 - 1.5}px`;
+            
+            moodZigzag.appendChild(connector);
+          }
+        });
+      }
+      
+      // Handle mood selection
+      moodSteps.forEach(step => {
+        step.addEventListener('click', function() {
+          // Remove active class from all steps
+          moodSteps.forEach(s => s.classList.remove('active'));
+          
+          // Add active class to clicked step
+          this.classList.add('active');
+          
+          // Store selected mood
+          const selectedMood = this.dataset.mood;
+          localStorage.setItem('selectedMood', selectedMood);
+          
+          // Add subtle animation
+          this.style.transform = 'scale(1.1)';
+          setTimeout(() => {
+            this.style.transform = 'scale(1)';
+          }, 200);
+        });
+      });
+      
+      // Create connectors after a short delay to ensure proper positioning
+      setTimeout(createConnectors, 100);
+      
+      // Handle window resize
+      let resizeTimeout;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+          // Remove existing connectors
+          document.querySelectorAll('.mood-connector').forEach(c => c.remove());
+          // Recreate connectors
+          createConnectors();
+        }, 250);
+      });
+    });
+
+    function tryDemo() {
+      document.getElementById('assessmentPage').style.display = 'flex';
+      showPage('assessmentPage');
+      renderStep();
+    }
+  </script>
+  <div id="editModal" class="modal-bg" style="display:none;">
+    <div class="modal-content">
+      <div id="editModalTitle" style="font-weight:700;font-size:1.2em;margin-bottom:18px;"></div>
+      <div id="editModalField"></div>
+      <div class="modal-actions">
+        <button class="modal-btn save" id="editModalSave">Save</button>
+        <button class="modal-btn cancel" id="editModalCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

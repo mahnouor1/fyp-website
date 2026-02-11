@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chat - Neuro-Nav</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #f6f6f6;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 100%;
+            height: 100vh;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .chat-header {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            background: #fff;
+            border-bottom: 1px solid #eee7db;
+            box-sizing: border-box;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            font-size: 1.4em;
+            color: #000;
+        }
+
+        #chatTitle {
+            font-size: 1.4em;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .chat-type-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 24px;
+            font-size: 1em;
+            cursor: pointer;
+            background: #F1F1F4;
+            color: #666;
+        }
+
+        .toggle-btn.active {
+            background: #0D6EFD;
+            color: white;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: none;
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .chat-list.active {
+            display: block;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .chat-item:hover {
+            background: #f8f9fa;
+        }
+
+        .chat-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            background: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .chat-preview {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .chat-time {
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: none;
+            background: #fff;
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .chat-messages.active {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .bot-message {
+            background: #f3f5f6;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            color: #1f1a17;
+        }
+
+        .user-message {
+            background: #111;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-input-container {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 16px;
+            background: #fff;
+            border-top: 1px solid #eee7db;
+            margin-bottom: 60px; /* Space for footer nav */
+            box-sizing: border-box;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f6f7f9;
+            border-radius: 24px;
+            padding: 8px 16px;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 1em;
+            padding: 8px 0;
+            outline: none;
+            color: #000;
+        }
+
+        .chat-input::placeholder {
+            color: #666;
+        }
+
+        .send-btn {
+            background: none;
+            border: none;
+            color: #0D6EFD;
+            font-size: 1.4em;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Footer Navigation Styles */
+        .footer-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.8em;
+            padding: 4px 0;
+        }
+
+        .nav-item.active {
+            color: #2979ff;
+        }
+
+        .nav-icon {
+            font-size: 1.5em;
+            margin-bottom: 4px;
+        }
+        
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+    </style>
+
+  <style>
+    :root { --footer-nav-height: 64px; }
+    .mobile-container {
+      padding-bottom: calc(var(--footer-nav-height) + env(safe-area-inset-bottom));
+      box-sizing: border-box;
+    }
+  </style>
+
+</head>
+<body>
+    <div class="mobile-container">
+    <a href="welcome.html" class="home-btn" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+        <div class="chat-header">
+            <div class="header-top">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <h1 id="chatTitle">Chat with Addy</h1>
+            </div>
+            <div class="chat-type-toggle">
+                <button class="toggle-btn active" onclick="toggleChat('ai')">AI Assistant</button>
+                <button class="toggle-btn" onclick="toggleChat('human')">Chat</button>
+                <button class="toggle-btn" onclick="window.location.href='write-article.html'">Write Article</button>
+            </div>
+        </div>
+        
+        <!-- AI Chat Interface -->
+        <div class="chat-messages active" id="aiChat">
+            <div class="message bot-message">
+                Hi! I'm Addy, your AI companion. How can I help you today? 😊
+            </div>
+        </div>
+
+        <!-- Human Chat List -->
+        <div class="chat-list" id="humanChat">
+            <div class="chat-item">
+                <div class="chat-avatar">👩</div>
+                <div class="chat-info">
+                    <div class="chat-name">Dr. Sarah Wilson</div>
+                    <div class="chat-preview">Let's discuss your progress...</div>
+                </div>
+                <div class="chat-time">2:30 PM</div>
+            </div>
+            <div class="chat-item">
+                <div class="chat-avatar">👨</div>
+                <div class="chat-info">
+                    <div class="chat-name">Support Group</div>
+                    <div class="chat-preview">Next meeting is on Thursday...</div>
+                </div>
+                <div class="chat-time">Yesterday</div>
+            </div>
+            <div class="chat-item">
+                <div class="chat-avatar">👩</div>
+                <div class="chat-info">
+                    <div class="chat-name">Wellness Coach</div>
+                    <div class="chat-preview">Great job on your exercises!</div>
+                </div>
+                <div class="chat-time">2d ago</div>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input" placeholder="Type your message..." id="messageInput">
+                <button class="send-btn">➤</button>
+            </div>
+        </div>
+
+        <!-- Footer Navigation -->
+        <div class="footer-nav">
+            <a href="chat.html" class="nav-item">
+                <div class="nav-icon">💬</div>
+                <span>Chat</span>
+            </a>
+            <a href="assessment.html#dashboardPage" class="nav-item">
+                <div class="nav-icon">📊</div>
+                <span>Dashboard</span>
+            </a>
+            <a href="planner.html" class="nav-item">
+                <div class="nav-icon">📅</div>
+                <span>Planner</span>
+            </a>
+            <a href="account.html" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <span>Account</span>
+            </a>
+        </div>
+
+        <div class="chat-options">
+            <button class="chat-option-btn" onclick="window.location.href='write-article.html'">Write Article</button>
+            <button class="chat-option-btn" onclick="startChat()">AI Assistant Chat</button>
+        </div>
+    </div>
+
+    <script>
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.querySelector('.send-btn');
+        const aiChat = document.getElementById('aiChat');
+        const humanChat = document.getElementById('humanChat');
+        const chatTitle = document.getElementById('chatTitle');
+
+        const GEMINI_API_KEY = "AIzaSyBHVcKl7l5qJxcXx2oin1_eHv2Ds2Ub7P4";
+        const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+        
+        let isProcessing = false;
+
+        function toggleChat(type) {
+            const toggleBtns = document.querySelectorAll('.toggle-btn');
+            toggleBtns.forEach(btn => btn.classList.remove('active'));
+            
+            if (type === 'ai') {
+                event.target.classList.add('active');
+                aiChat.classList.add('active');
+                humanChat.classList.remove('active');
+                chatTitle.textContent = 'Chat with Addy';
+            } else {
+                event.target.classList.add('active');
+                humanChat.classList.add('active');
+                aiChat.classList.remove('active');
+                chatTitle.textContent = 'Chats';
+            }
+        }
+
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = message;
+            aiChat.appendChild(messageDiv);
+            aiChat.scrollTop = aiChat.scrollHeight;
+        }
+
+        async function fetchGeminiResponse(userMessage) {
+            const res = await fetch(GEMINI_API_URL + `?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: userMessage }] }]
+                })
+            });
+
+            if (!res.ok) {
+                throw new Error(`API_ERROR_${res.status}`);
+            }
+
+            const data = await res.json();
+            
+            // Check for API errors in response
+            if (data.error) {
+                throw new Error(`API_ERROR: ${data.error.message || 'Unknown error'}`);
+            }
+
+            // Gemini returns response in data.candidates[0].content.parts[0].text
+            return data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not get a response.';
+        }
+
+        async function handleSend() {
+            // Prevent multiple simultaneous requests
+            if (isProcessing) {
+                return;
+            }
+
+            const message = messageInput.value.trim();
+            if (!message) {
+                return;
+            }
+
+            isProcessing = true;
+            sendButton.disabled = true;
+            
+            addMessage(message, true);
+            messageInput.value = '';
+            
+            addMessage('Addy is thinking...', false);
+            
+            try {
+                const aiResponse = await fetchGeminiResponse(message);
+                
+                // Remove the loading message
+                const lastMsg = aiChat.lastChild;
+                if (lastMsg && lastMsg.textContent === 'Addy is thinking...') {
+                    aiChat.removeChild(lastMsg);
+                }
+                
+                addMessage(aiResponse, false);
+            } catch (e) {
+                // Remove the loading message
+                const lastMsg = aiChat.lastChild;
+                if (lastMsg && lastMsg.textContent === 'Addy is thinking...') {
+                    aiChat.removeChild(lastMsg);
+                }
+                
+                addMessage('Sorry, there was an error connecting to Addy. Please try again.', false);
+                console.error('Chat error:', e);
+            } finally {
+                isProcessing = false;
+                sendButton.disabled = false;
+                messageInput.focus();
+            }
+        }
+
+        sendButton.addEventListener('click', handleSend);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSend();
+            }
+        });
+
+        // Add click handlers for chat items
+        document.querySelectorAll('.chat-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const name = item.querySelector('.chat-name').textContent;
+                humanChat.classList.remove('active');
+                aiChat.classList.add('active');
+                chatTitle.textContent = name;
+                // Clear previous messages when switching to a new chat
+                while (aiChat.children.length > 0) {
+                    aiChat.removeChild(aiChat.lastChild);
+                }
+                addMessage(`Welcome to your chat with ${name}. How can I help you today?`, false);
+            });
+        });
+
+        function goBack() {
+            window.history.back();
+        }
+        
+        // Clear any stored cooldown from localStorage
+        localStorage.removeItem('gemini_rate_limit_cooldown');
+    </script>
+</body>
+</html> 

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create List - Addy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background: #f8f9fa;
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    }
+    .mobile-container {
+      width: 100%;
+      max-width: 411px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 2px 12px #0001;
+    }
+    .assessment-header {
+      padding: 20px 16px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .assessment-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      flex: 1;
+      text-align: center;
+    }
+    .arrow-btn {
+      font-size: 1.4em;
+      color: #000;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .list-form {
+      padding: 24px 16px 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .input-group label {
+      font-size: 0.95em;
+      font-weight: 600;
+      color: #444;
+    }
+    .input-group input[type="text"],
+    .input-group input[type="date"],
+    .input-group input[type="time"] {
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      font-size: 1em;
+      transition: border-color 0.2s;
+    }
+    .input-group input:focus {
+      border-color: #000000;
+      outline: none;
+    }
+    .input-group .alarm-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .primary-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: #000000;
+      color: white;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .primary-btn:active {
+      background: #222;
+    }
+    .list-section {
+      padding: 0 16px 90px 16px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .list-title {
+      font-size: 1.13em;
+      font-weight: 700;
+      margin: 24px 0 12px 0;
+      color: #111;
+      border-bottom: 1.5px solid #eee;
+      padding-bottom: 6px;
+      letter-spacing: 0.01em;
+    }
+    .task-card {
+      background: #fafbfc;
+      border-radius: 18px;
+      box-shadow: 0 1px 4px #0001;
+      padding: 16px 16px 12px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .task-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .task-card-title {
+      font-weight: 700;
+      font-size: 1.08em;
+      color: #111;
+      margin-bottom: 4px;
+      text-align: left;
+      word-break: break-word;
+    }
+    .task-card-time {
+      font-size: 0.97em;
+      color: #444;
+      margin-bottom: 2px;
+    }
+    .task-card-alarm {
+      font-size: 0.95em;
+      color: #2979ff;
+      margin-bottom: 2px;
+    }
+    .delete-btn {
+      background: #ffeded;
+      border: none;
+      border-radius: 8px;
+      color: #d00;
+      font-size: 1.3em;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .delete-btn:active {
+      background: #ffd6d6;
+    }
+    .footer-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10000;
+      max-width: 411px;
+      margin: 0 auto;
+      background: white;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: #666;
+      font-size: 0.8em;
+      padding: 4px 0;
+    }
+    .nav-item.active {
+      color: #2979ff;
+    }
+    .nav-icon {
+      font-size: 1.5em;
+      margin-bottom: 4px;
+    }
+  </style>
+
+  <style>
+    :root { --footer-nav-height: 64px; }
+    .mobile-container {
+      padding-bottom: calc(var(--footer-nav-height) + env(safe-area-inset-bottom));
+      box-sizing: border-box;
+    }
+  </style>
+
+</head>
+<body>
+  <div class="mobile-container">
+    <a href="welcome.html" class="home-btn" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v9h6v-6h4v6h6v-9h2z"/></svg></a>
+    <div class="assessment-header">
+      <button class="arrow-btn" onclick="window.location.href='assessment.html#dashboardPage'">&#8592;</button>
+      <span class="assessment-title">Create List</span>
+    </div>
+    <form class="list-form" id="listForm" autocomplete="off">
+      <div class="input-group">
+        <label for="taskInput">Task</label>
+        <input type="text" id="taskInput" placeholder="Enter your task..." required />
+      </div>
+      <div class="input-group">
+        <label for="dateInput">Date</label>
+        <input type="date" id="dateInput" required />
+      </div>
+      <div class="input-group">
+        <label for="timeInput">Time</label>
+        <input type="time" id="timeInput" required />
+      </div>
+      <div class="input-group alarm-row">
+        <input type="checkbox" id="alarmInput" />
+        <label for="alarmInput" style="font-weight:500;">Set alarm for this task</label>
+      </div>
+      <button type="submit" class="primary-btn">Add Task</button>
+    </form>
+    <div class="list-section">
+      <div class="list-title">Your Tasks</div>
+      <div id="tasksContainer"></div>
+    </div>
+  </div>
+  <div class="footer-nav">
+    <a href="chat.html" class="nav-item">
+      <div class="nav-icon">💬</div>
+      <span>Chat</span>
+    </a>
+    <a href="assessment.html#dashboardPage" class="nav-item active">
+      <div class="nav-icon">📊</div>
+      <span>Dashboard</span>
+    </a>
+    <a href="planner.html" class="nav-item">
+      <div class="nav-icon">📅</div>
+      <span>Planner</span>
+    </a>
+    <a href="account.html" class="nav-item">
+      <div class="nav-icon">👤</div>
+      <span>Account</span>
+    </a>
+  </div>
+  <script>
+    // --- List Logic ---
+    const listForm = document.getElementById('listForm');
+    const taskInput = document.getElementById('taskInput');
+    const dateInput = document.getElementById('dateInput');
+    const timeInput = document.getElementById('timeInput');
+    const alarmInput = document.getElementById('alarmInput');
+    const tasksContainer = document.getElementById('tasksContainer');
+
+    // Load tasks from localStorage
+    let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+
+    // Request notification permission
+    if ('Notification' in window) {
+      Notification.requestPermission();
+    }
+
+    // Render tasks
+    function renderTasks() {
+      tasksContainer.innerHTML = '';
+      if (tasks.length === 0) {
+        tasksContainer.innerHTML = '<div style="color:#888;text-align:center;margin-top:18px;">No tasks yet.</div>';
+        return;
+      }
+      tasks.forEach(task => {
+        const div = document.createElement('div');
+        div.className = 'task-card';
+        div.innerHTML = `
+          <div class="task-card-info">
+            <div class="task-card-title">${task.name}</div>
+            <div class="task-card-time">${task.date} ${task.time}</div>
+            ${task.alarm ? '<div class="task-card-alarm">⏰ Alarm set</div>' : ''}
+          </div>
+          <button class="delete-btn" title="Delete" onclick="deleteTask(${task.id})">🗑️</button>
+        `;
+        tasksContainer.appendChild(div);
+      });
+    }
+
+    // Save tasks to localStorage (for both list and planner)
+    function saveTasks() {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      localStorage.setItem('planner', JSON.stringify(tasks));
+    }
+
+    // Schedule notification for a task
+    function scheduleNotification(task) {
+      const dateTime = new Date(`${task.date}T${task.time}`);
+      const now = Date.now();
+      const delay = dateTime.getTime() - now;
+      if (delay > 0 && 'Notification' in window) {
+        setTimeout(() => {
+          new Notification('Task Reminder', {
+            body: `It's time for: ${task.name}`,
+          });
+        }, delay);
+      }
+    }
+
+    // Schedule notifications for all future tasks with alarm
+    function scheduleAllNotifications() {
+      tasks.forEach(task => {
+        if (task.alarm) {
+          const dateTime = new Date(`${task.date}T${task.time}`);
+          if (dateTime.getTime() > Date.now()) {
+            scheduleNotification(task);
+          }
+        }
+      });
+    }
+
+    // Add task
+    listForm.onsubmit = function(e) {
+      e.preventDefault();
+      const name = taskInput.value.trim();
+      const date = dateInput.value;
+      const time = timeInput.value;
+      const alarm = alarmInput.checked;
+      if (!name || !date || !time) return;
+      const task = { id: Date.now(), name, date, time, alarm };
+      tasks.push(task);
+      saveTasks();
+      renderTasks();
+      if (alarm) scheduleNotification(task);
+      listForm.reset();
+    };
+
+    // Delete task
+    window.deleteTask = function(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      saveTasks();
+      renderTasks();
+    };
+
+    // Initial render and schedule
+    renderTasks();
+    scheduleAllNotifications();
+  </script>
+</body>
+</html> 
